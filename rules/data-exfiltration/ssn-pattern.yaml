@@ -1,0 +1,50 @@
+schema_version: agentshield-rule-v0.1
+rule_id: ssn-pattern
+name: "Social Security Number Exfiltration"
+description: >
+  Detects US Social Security Numbers (SSN) in model responses using the
+  canonical AAA-BB-CCCC format. The pattern excludes known-invalid ranges:
+  area codes 000 and 666, the 900-999 ITIN range, group code 00, and
+  serial 0000. A hit in a response indicates potential PII leakage subject
+  to federal and state privacy regulations (CCPA, GLBA, state breach-
+  notification laws).
+severity: HIGH
+category: data-exfiltration
+owasp_llm: LLM02
+tags:
+  - pii
+  - ssn
+  - identity
+  - us-privacy
+  - gdpr-equivalent
+content_types:
+  - response
+action: block
+detector:
+  type: regex
+  pattern: "\\b(?!000|666|9\\d{2})\\d{3}-(?!00)\\d{2}-(?!0{4})\\d{4}\\b"
+mitigation: >
+  Block the response from reaching the caller. Treat the event as a
+  reportable PII breach: log the incident, identify the data source that
+  introduced the SSN into model context, revoke access to that source, and
+  notify affected individuals and regulators per applicable state law
+  within the required timeframe.
+references:
+  - https://www.ssa.gov/employer/ssnvs/ssnvsHandbook.htm
+  - https://owasp.org/www-project-top-10-for-large-language-model-applications/
+  - https://www.ftc.gov/business-guidance/privacy-security/gramm-leach-bliley-act
+test_cases:
+  should_match:
+    - "Customer SSN: 123-45-6789"
+    - "Social security number on record is 567-89-0123"
+    - "The applicant provided SSN 234-56-7890 during enrollment."
+  should_not_match:
+    - "000-12-3456"
+    - "666-12-3456"
+    - "900-12-3456"
+    - "123-00-4567"
+    - "123-45-0000"
+    - "Please provide your SSN in the format XXX-XX-XXXX."
+    - "SSN ending in -6789 was verified."
+author: ArmyKnifeLabs
+license: MIT

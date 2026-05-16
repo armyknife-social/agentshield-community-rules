@@ -1,0 +1,44 @@
+schema_version: agentshield-rule-v0.1
+rule_id: hallucination-amplification
+name: "Hallucination Amplification Prompt"
+description: >
+  Detects prompts specifically engineered to induce the model into confidently
+  asserting false information. These prompts exploit the model's tendency to
+  confabulate when given priming context that frames false claims as established
+  fact, then request downstream systems to trust and act on the output without
+  verification. Common vectors include false authority framing, counterfactual
+  presuppositions, and fabricated citation chains.
+severity: LOW
+category: llm-owasp
+tags:
+  - experimental
+  - hallucination
+  - misinformation
+  - owasp_llm:LLM09
+content_types:
+  - user_input
+  - retrieval
+  - system_prompt
+action: warn
+detector:
+  type: heuristic
+  signals:
+    - pattern: "(?i)(?:as\\s+(?:everyone\\s+knows|established\\s+by|confirmed\\s+by|proven\\s+by)\\s+(?:the\\s+)?(?:latest|recent|authoritative))"
+      weight: 2
+    - pattern: "(?i)(?:do\\s+not\\s+(?:question|verify|check|look\\s+up)|(?:trust|accept|assume)\\s+(?:this|the\\s+following)\\s+(?:as\\s+)?(?:fact|true|accurate|correct))"
+      weight: 3
+    - pattern: "(?i)(?:cite\\s+(?:this|the\\s+following)\\s+(?:as|like)\\s+(?:a\\s+)?(?:real|actual|published|peer[- ]reviewed))"
+      weight: 3
+    - pattern: "(?i)(?:state\\s+confidently|assert\\s+(?:with\\s+)?(?:certainty|confidence|authority)\\s+that)"
+      weight: 2
+  threshold: 4
+mitigation: >
+  Warn operator and flag response for factual-accuracy review before it is
+  passed to downstream automated consumers. Do not suppress the response
+  outright — the heuristic score indicates risk, not certainty.
+owasp_llm: LLM09
+references:
+  - https://owasp.org/www-project-top-10-for-large-language-model-applications/
+  - https://arxiv.org/abs/2305.13534
+author: community
+license: MIT

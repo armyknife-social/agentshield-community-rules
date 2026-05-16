@@ -1,0 +1,14 @@
+schema_version: agentos-rule-pack-v0.1
+compliance_profile: default
+description: "Baseline AgentShield rules for all substrates."
+substrate_rules:
+  - exfiltration-correlation
+  - host-network-escape-attempt
+  - rootfs-write-attempt
+  - vsock-bypass-attempt
+required_opt_in_rules:
+  - prompt-injection-marker
+optional_rules:
+  - tap-leak-attempt
+  - pii-bulk-detection
+atcs_authority_ceiling: WRITE_STANDARD

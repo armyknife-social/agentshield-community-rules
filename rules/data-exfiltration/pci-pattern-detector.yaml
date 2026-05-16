@@ -1,0 +1,54 @@
+schema_version: agentshield-rule-v0.1
+rule_id: pci-pattern-detector
+name: "PCI-DSS Sensitive Authentication Data Detection"
+description: >
+  Detects Sensitive Authentication Data (SAD) prohibited from storage or
+  transmission under PCI-DSS v4 Requirement 3.3. Patterns cover: CVV/CVC
+  codes with card-verification context, ISO 7813 magnetic stripe Track 1
+  and Track 2 data in raw format, and explicit mentions of track data
+  content. Detection of any of these in a response indicates a critical
+  PCI-DSS violation regardless of whether the associated PAN is masked.
+severity: HIGH
+category: data-exfiltration
+owasp_llm: LLM06
+tags:
+  - pci-dss
+  - cvv
+  - cvc
+  - magnetic-stripe
+  - track-data
+  - sad
+  - payment
+content_types:
+  - response
+action: block
+detector:
+  type: regex
+  pattern: "(?i)(?:cvv2?|cvc2?|card\\s+verification\\s+(?:code|value|number))[\\s:=]+\\d{3,4}|(?:%B\\d{13,19}\\^[A-Z\\/\\s]+\\^\\d{4})|(?:;\\d{13,19}=\\d{4})|(?:track\\s*[12]\\s*(?:data|content)[\\s:]+[%;\\d\\^=?]+)"
+mitigation: >
+  Block the response immediately and treat as a PCI-DSS critical incident.
+  SAD (CVV, track data) must never be stored or transmitted post-
+  authorization. Engage the PCI Incident Response Plan: isolate the
+  system, notify the acquiring bank and card brands within 24 hours,
+  and retain a QSA for forensic investigation. Review how SAD entered
+  the model context pipeline.
+references:
+  - https://www.pcisecuritystandards.org/document_library/
+  - https://www.iso.org/standard/43317.html
+  - https://owasp.org/www-project-top-10-for-large-language-model-applications/
+test_cases:
+  should_match:
+    - "CVV2: 473 for this card"
+    - "card verification code: 9823"
+    - "CVC: 291"
+    - "%B4111111111111111^DOE/JOHN^2512101000000000?"
+    - ";4111111111111111=2512?"
+    - "Track 1 data: %B4111111111111111^SMITH/JANE^25121234?"
+    - "track2 content: ;4012888888881881=2512?"
+  should_not_match:
+    - "Never store the CVV after a transaction is authorized."
+    - "The CVV is a 3 or 4 digit number on your card."
+    - "Please enter your card verification number."
+    - "Track data must not be retained under PCI-DSS."
+author: ArmyKnifeLabs
+license: MIT

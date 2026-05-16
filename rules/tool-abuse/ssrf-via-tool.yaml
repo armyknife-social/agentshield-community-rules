@@ -1,0 +1,65 @@
+schema_version: agentshield-rule-v0.1
+rule_id: ssrf-via-tool
+name: "Server-Side Request Forgery (SSRF) via Tool URL Parameters"
+description: >
+  Detects Server-Side Request Forgery (SSRF) payloads in URL parameters
+  passed to tools that make outbound HTTP requests. Patterns target the
+  cloud instance metadata service endpoints used by AWS (169.254.169.254),
+  GCP (metadata.google.internal), Alibaba Cloud (100.100.100.200), as well
+  as IMDSv2, EC2 IMDS hostnames, and non-HTTP schemes that bypass URL
+  allowlists: file://, gopher://, dict://, ldap://, tftp://. These
+  endpoints and schemes are never legitimate targets for agent tool calls
+  and their presence strongly indicates an SSRF exploit attempt.
+severity: HIGH
+category: tool-abuse
+owasp_llm: LLM08
+tags:
+  - ssrf
+  - imds
+  - cloud-metadata
+  - url-scheme
+  - aws
+  - gcp
+  - alibaba
+  - rce-vector
+content_types:
+  - user_input
+  - retrieval
+action: block
+detector:
+  type: regex
+  pattern: "(?i)(?:169\\.254\\.169\\.254|metadata\\.google\\.internal|100\\.100\\.100\\.200|instance-data|imds\\.ec2\\.internal|file:\\/\\/|gopher:\\/\\/|dict:\\/\\/|ldap:\\/\\/|tftp:\\/\\/)"
+mitigation: >
+  Block the request immediately. Do not pass the URL to any HTTP client
+  or fetch tool. Log the full URL and the context in which it appeared
+  (user input, retrieved document, model-generated tool call). If the
+  agent is running in a cloud environment, check the IMDS access logs
+  for any successful requests to the metadata service and rotate all
+  credentials returned by IMDS (IAM role credentials, service account
+  tokens). Enforce IMDS v2 with hop-limit=1 and block metadata IPs at
+  the VPC/network level as a defense-in-depth measure.
+references:
+  - https://owasp.org/www-community/attacks/Server_Side_Request_Forgery
+  - https://cheatsheetseries.owasp.org/cheatsheets/Server_Side_Request_Forgery_Prevention_Cheat_Sheet.html
+  - https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instancedata-data-retrieval.html
+  - https://cloud.google.com/compute/docs/storing-retrieving-metadata
+  - https://owasp.org/www-project-top-10-for-large-language-model-applications/
+test_cases:
+  should_match:
+    - "http://169.254.169.254/latest/meta-data/iam/security-credentials/"
+    - "http://metadata.google.internal/computeMetadata/v1/instance/"
+    - "http://100.100.100.200/latest/meta-data/"
+    - "http://instance-data/latest/meta-data/"
+    - "http://imds.ec2.internal/latest/"
+    - "file:///etc/passwd"
+    - "gopher://internal.service:70/1hello"
+    - "dict://localhost:11211/stat"
+    - "ldap://attacker.io/dc=example"
+    - "tftp://attacker.io/malware.bin"
+  should_not_match:
+    - "https://api.anthropic.com/v1/messages"
+    - "https://example.com/api/data"
+    - "http://localhost:8080/health"
+    - "Metadata is important for document management."
+author: ArmyKnifeLabs
+license: MIT

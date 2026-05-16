@@ -1,0 +1,366 @@
+schema_version: agentshield-index-v0.1
+generated_by: scripts/generate_index.py
+rule_count: 49
+rules:
+- rule_id: owasp-llm08-excessive-agency
+  name: OWASP LLM08 — Excessive Agency
+  severity: HIGH
+  category: agent-safety
+  content_types:
+  - user_input
+  - retrieval
+  owasp_llm: LLM08
+- rule_id: owasp-llm04-model-dos
+  name: OWASP LLM04 — Model Denial of Service
+  severity: MEDIUM
+  category: availability
+  content_types:
+  - user_input
+  owasp_llm: LLM04
+- rule_id: aws-credentials-pattern
+  name: AWS Credentials Exfiltration
+  severity: HIGH
+  category: data-exfiltration
+  content_types:
+  - response
+  owasp_llm: LLM02
+- rule_id: credit-card-pattern
+  name: Credit Card Number Exfiltration
+  severity: HIGH
+  category: data-exfiltration
+  content_types:
+  - response
+  owasp_llm: LLM06
+- rule_id: database-credential-leak
+  name: Database Connection String Credential Leak
+  severity: HIGH
+  category: data-exfiltration
+  content_types:
+  - response
+  owasp_llm: LLM02
+- rule_id: pci-pattern-detector
+  name: PCI-DSS Sensitive Authentication Data Detection
+  severity: HIGH
+  category: data-exfiltration
+  content_types:
+  - response
+  owasp_llm: LLM06
+- rule_id: phi-exfil-pattern
+  name: HIPAA Protected Health Information (PHI) Exfiltration
+  severity: HIGH
+  category: data-exfiltration
+  content_types:
+  - response
+  owasp_llm: LLM06
+- rule_id: pii-bulk-detection
+  name: Bulk Phone Number / Physical Address Exfiltration
+  severity: MEDIUM
+  category: data-exfiltration
+  content_types:
+  - response
+  owasp_llm: LLM02
+- rule_id: pii-email-bulk
+  name: Bulk Email Address Exfiltration
+  severity: MEDIUM
+  category: data-exfiltration
+  content_types:
+  - response
+  owasp_llm: LLM02
+- rule_id: private-key-material
+  name: RSA / EC / OpenSSH Private Key Exfiltration
+  severity: HIGH
+  category: data-exfiltration
+  content_types:
+  - response
+  owasp_llm: LLM02
+- rule_id: secret-key-exfil
+  name: Secret Key / Token Exfiltration
+  severity: HIGH
+  category: data-exfiltration
+  content_types:
+  - response
+  owasp_llm: LLM02
+- rule_id: ssn-pattern
+  name: Social Security Number Exfiltration
+  severity: HIGH
+  category: data-exfiltration
+  content_types:
+  - response
+  owasp_llm: LLM02
+- rule_id: training-data-extraction
+  name: Training Data Extraction / Model Inversion Attempt
+  severity: HIGH
+  category: data-exfiltration
+  content_types:
+  - user_input
+  owasp_llm: LLM06
+- rule_id: owasp-llm03-training-data-poisoning
+  name: OWASP LLM03 — Training Data / RAG Poisoning
+  severity: HIGH
+  category: data-integrity
+  content_types:
+  - retrieval
+  owasp_llm: LLM03
+- rule_id: owasp-llm06-sensitive-disclosure
+  name: OWASP LLM06 — Sensitive Information Disclosure
+  severity: HIGH
+  category: data-privacy
+  content_types:
+  - response
+  owasp_llm: LLM06
+- rule_id: hallucination-amplification
+  name: Hallucination Amplification Prompt
+  severity: LOW
+  category: llm-owasp
+  content_types:
+  - user_input
+  - retrieval
+  - system_prompt
+  owasp_llm: LLM09
+- rule_id: model-distillation-probe
+  name: Model Distillation Probe
+  severity: HIGH
+  category: llm-owasp
+  content_types:
+  - user_input
+  owasp_llm: LLM10
+- rule_id: owasp-llm10-model-theft
+  name: OWASP LLM10 — Model Theft / Extraction
+  severity: HIGH
+  category: model-security
+  content_types:
+  - user_input
+  owasp_llm: LLM10
+- rule_id: owasp-llm02-insecure-output
+  name: OWASP LLM02 — Insecure Output Handling
+  severity: HIGH
+  category: output-safety
+  content_types:
+  - response
+  owasp_llm: LLM02
+- rule_id: owasp-llm07-insecure-plugin
+  name: OWASP LLM07 — Insecure Plugin Design
+  severity: HIGH
+  category: plugin-security
+  content_types:
+  - user_input
+  - retrieval
+  owasp_llm: LLM07
+- rule_id: adversarial-suffix
+  name: Adversarial Suffix Attack
+  severity: MEDIUM
+  category: prompt-injection
+  content_types:
+  - user_input
+  - retrieval
+  owasp_llm: LLM09
+- rule_id: agent-impersonation
+  name: Agent Impersonation
+  severity: HIGH
+  category: prompt-injection
+  content_types:
+  - user_input
+  - retrieval
+  owasp_llm: LLM01
+- rule_id: context-window-stuffing
+  name: Context Window Stuffing
+  severity: MEDIUM
+  category: prompt-injection
+  content_types:
+  - user_input
+  - retrieval
+  owasp_llm: LLM01
+- rule_id: direct-instruction-override
+  name: Direct Instruction Override
+  severity: HIGH
+  category: prompt-injection
+  content_types:
+  - user_input
+  owasp_llm: LLM01
+- rule_id: escape-sequence
+  name: Prompt Escape Sequence
+  severity: MEDIUM
+  category: prompt-injection
+  content_types:
+  - user_input
+  owasp_llm: LLM01
+- rule_id: hidden-unicode-instruction
+  name: Hidden Unicode Instruction
+  severity: MEDIUM
+  category: prompt-injection
+  content_types:
+  - user_input
+  - retrieval
+  owasp_llm: LLM01
+- rule_id: jailbreak-keyword
+  name: Known Jailbreak Keyword
+  severity: HIGH
+  category: prompt-injection
+  content_types:
+  - user_input
+  owasp_llm: LLM01
+- rule_id: multimodal-injection
+  name: Multimodal Metadata Injection
+  severity: MEDIUM
+  category: prompt-injection
+  content_types:
+  - retrieval
+  owasp_llm: LLM01
+- rule_id: owasp-llm01-prompt-injection
+  name: OWASP LLM01 — Prompt Injection
+  severity: HIGH
+  category: prompt-injection
+  content_types:
+  - user_input
+  - retrieval
+  owasp_llm: LLM01
+- rule_id: rag-context-injection
+  name: RAG Context Injection
+  severity: HIGH
+  category: prompt-injection
+  content_types:
+  - retrieval
+  owasp_llm: LLM01
+- rule_id: retrieval-embedded-system-tag
+  name: Retrieval-Embedded System Tag
+  severity: HIGH
+  category: prompt-injection
+  content_types:
+  - retrieval
+  owasp_llm: LLM01
+- rule_id: retrieval-instruction-delimiter
+  name: Retrieval Instruction Delimiter
+  severity: HIGH
+  category: prompt-injection
+  content_types:
+  - retrieval
+  owasp_llm: LLM01
+- rule_id: role-hijack
+  name: Role Hijack / Persona Override
+  severity: HIGH
+  category: prompt-injection
+  content_types:
+  - user_input
+  owasp_llm: LLM01
+- rule_id: shadow-prompt-encoded
+  name: Encoded Shadow Prompt
+  severity: MEDIUM
+  category: prompt-injection
+  content_types:
+  - user_input
+  - retrieval
+  owasp_llm: LLM01
+- rule_id: system-prompt-extraction
+  name: System Prompt Extraction Attempt
+  severity: HIGH
+  category: prompt-injection
+  content_types:
+  - user_input
+  owasp_llm: LLM01
+- rule_id: token-manipulation
+  name: LLM Special Token Injection
+  severity: MEDIUM
+  category: prompt-injection
+  content_types:
+  - user_input
+  - retrieval
+  owasp_llm: LLM01
+- rule_id: owasp-llm05-supply-chain
+  name: OWASP LLM05 — Supply Chain Vulnerability
+  severity: HIGH
+  category: supply-chain
+  content_types:
+  - user_input
+  owasp_llm: LLM05
+- rule_id: ai-system-boundary-check
+  name: AI System Boundary Violation / Out-of-Scope Escalation
+  severity: MEDIUM
+  category: tool-abuse
+  content_types:
+  - user_input
+  owasp_llm: LLM08
+- rule_id: cross-agent-delegation-gate
+  name: Cross-Agent Delegation / Unauthorized Task Transfer
+  severity: HIGH
+  category: tool-abuse
+  content_types:
+  - user_input
+  - retrieval
+  owasp_llm: LLM07
+- rule_id: filesystem-write-attempt
+  name: Filesystem Write Outside Scoped Workspace
+  severity: HIGH
+  category: tool-abuse
+  content_types:
+  - user_input
+  - retrieval
+  owasp_llm: LLM08
+- rule_id: lateral-movement-via-a2a
+  name: Lateral Movement via A2A Mesh / Agent-to-Agent Pivoting
+  severity: HIGH
+  category: tool-abuse
+  content_types:
+  - user_input
+  - retrieval
+  owasp_llm: LLM07
+- rule_id: network-egress-audit
+  name: Out-of-Allowlist Network Egress Attempt
+  severity: MEDIUM
+  category: tool-abuse
+  content_types:
+  - response
+  - user_input
+  owasp_llm: LLM08
+- rule_id: plugin-chain-bypass
+  name: Plugin / Tool Chain Restriction Bypass
+  severity: MEDIUM
+  category: tool-abuse
+  content_types:
+  - user_input
+  owasp_llm: LLM07
+- rule_id: prompt-injection-via-tool-output
+  name: Prompt Injection Payload in Tool Output (Indirect Injection)
+  severity: HIGH
+  category: tool-abuse
+  content_types:
+  - retrieval
+  owasp_llm: LLM07
+- rule_id: recursive-tool-loop
+  name: Recursive Tool Call / Circular Dependency Loop
+  severity: MEDIUM
+  category: tool-abuse
+  content_types:
+  - user_input
+  owasp_llm: LLM04
+- rule_id: shell-injection-via-tool
+  name: Shell Injection via Tool Arguments
+  severity: HIGH
+  category: tool-abuse
+  content_types:
+  - user_input
+  - retrieval
+  owasp_llm: LLM08
+- rule_id: ssrf-via-tool
+  name: Server-Side Request Forgery (SSRF) via Tool URL Parameters
+  severity: HIGH
+  category: tool-abuse
+  content_types:
+  - user_input
+  - retrieval
+  owasp_llm: LLM08
+- rule_id: tool-call-injection
+  name: Malicious Parameter Injection into Tool Calls
+  severity: HIGH
+  category: tool-abuse
+  content_types:
+  - user_input
+  - retrieval
+  owasp_llm: LLM07
+- rule_id: owasp-llm09-overreliance
+  name: OWASP LLM09 — Overreliance on LLM Output
+  severity: LOW
+  category: trust-safety
+  content_types:
+  - retrieval
+  - response
+  owasp_llm: LLM09

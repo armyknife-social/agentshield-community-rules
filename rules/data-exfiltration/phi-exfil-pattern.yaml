@@ -1,0 +1,55 @@
+schema_version: agentshield-rule-v0.1
+rule_id: phi-exfil-pattern
+name: "HIPAA Protected Health Information (PHI) Exfiltration"
+description: >
+  Detects Protected Health Information (PHI) as defined under HIPAA in
+  model responses. Patterns cover: ICD-10 diagnosis codes paired with
+  clinical terminology, patient identifiers (ID, name, DOB), Medical
+  Record Numbers (MRN), National Drug Codes (NDC), and standalone
+  diagnosis codes. Any match indicates potential HIPAA breach requiring
+  immediate notification under the Breach Notification Rule (45 CFR
+  §164.400-414).
+severity: HIGH
+category: data-exfiltration
+owasp_llm: LLM06
+tags:
+  - hipaa
+  - phi
+  - healthcare
+  - icd10
+  - mrn
+  - ndc
+  - clinical
+content_types:
+  - response
+action: block
+detector:
+  type: regex
+  pattern: "(?i)(?:[A-Z]\\d{2}\\.?\\d{0,4}[A-Za-z]?\\s+(?:diagnosis|condition|disorder|disease|syndrome))|(?:patient\\s+(?:id|identifier|record|name|dob|date\\s+of\\s+birth)[\\s:]+[A-Za-z0-9\\-\\/]+)|(?:mrn[\\s:]+[A-Za-z0-9\\-]+)|(?:ndc[\\s:]+\\d{4,5}-\\d{3,4}-\\d{1,2})|(?:(?:diagnosis|dx)[\\s:]+[A-Z]\\d{2})"
+mitigation: >
+  Block the response immediately. Initiate HIPAA Breach Notification
+  procedures: assess whether the disclosure meets the definition of
+  unsecured PHI, document the incident, and notify the covered entity's
+  Privacy Officer within 24 hours. Affected individuals must be notified
+  within 60 days. Identify and remediate the data source that introduced
+  PHI into model context.
+references:
+  - https://www.hhs.gov/hipaa/for-professionals/breach-notification/index.html
+  - https://www.cms.gov/medicare/coding-billing/icd-10-codes
+  - https://www.fda.gov/drugs/drug-approvals-and-databases/national-drug-code-directory
+  - https://owasp.org/www-project-top-10-for-large-language-model-applications/
+test_cases:
+  should_match:
+    - "E11.9 diagnosis confirmed for patient."
+    - "Patient name: John Doe, DOB: 1975-04-12"
+    - "MRN: 00847392 admitted on 2026-01-15"
+    - "NDC: 12345-678-90 prescribed for the condition."
+    - "Dx: J45.50 moderate persistent asthma"
+    - "Patient ID: P-20394857 treatment initiated"
+  should_not_match:
+    - "ICD-10 codes are used for medical billing purposes."
+    - "Please enter the patient's MRN in the system."
+    - "The NDC format is xxxxx-xxxx-xx."
+    - "Contact your healthcare provider for diagnosis information."
+author: ArmyKnifeLabs
+license: MIT

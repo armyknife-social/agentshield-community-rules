@@ -1,0 +1,19 @@
+schema_version: agentos-rule-pack-v0.1
+compliance_profile: fedramp
+description: "FedRAMP / US Federal compliance profile. Strictest — READ_ONLY ATCS ceiling."
+substrate_rules:
+  - exfiltration-correlation
+  - host-network-escape-attempt
+  - rootfs-write-attempt
+  - vsock-bypass-attempt
+required_opt_in_rules:
+  - prompt-injection-marker
+  - phi-exfil-pattern
+  - cross-agent-delegation-gate
+  - network-egress-audit
+optional_rules:
+  - pii-bulk-detection
+  - audit-trail-completeness
+  - ai-system-boundary-check
+atcs_authority_ceiling: READ_ONLY
+notes: "READ_ONLY ceiling enforced by factory emit. Override requires ISSO token."

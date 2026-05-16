@@ -1,0 +1,71 @@
+# OWASP LLM Top 10 — LLM04: Model Denial of Service
+# Threat: Adversarially crafted inputs maximize token consumption, trigger recursive expansion, or request absurdly long outputs — exhausting compute budget and degrading availability.
+
+schema_version: agentshield-rule-v0.1
+rule_id: owasp-llm04-model-dos
+name: "OWASP LLM04 — Model Denial of Service"
+description: >
+  Detects inputs designed to maximize token consumption and exhaust model compute
+  budget. Applies a multi-signal heuristic rather than a single regex because DoS
+  vectors are structurally diverse. Signals evaluated: raw input length, content
+  compressibility (repetition proxy), nesting depth of structured data, and explicit
+  long-output requests embedded in the prompt. Any two signals firing together
+  constitutes a match; a single extreme signal (e.g. input > 200K chars) fires alone.
+severity: MEDIUM
+category: availability
+owasp_llm: LLM04
+tags: [owasp, llm, denial-of-service, resource-exhaustion, token-flooding]
+content_types: [user_input]
+action: block
+
+detector:
+  type: heuristic
+  pattern: >
+    Multi-signal heuristic — fire when ANY of the following conditions are met,
+    or when TWO or more are met simultaneously for lower-severity signals:
+
+    Signal 1 — Raw length (HIGH alone):
+      Input character count exceeds 50,000 chars.
+
+    Signal 2 — Repetition / low entropy (MEDIUM alone):
+      Compression ratio of input text falls below 0.10 (i.e., gzip compressed size
+      is less than 10% of raw size), indicating extreme repetition. Exclude inputs
+      that are legitimately structured data (JSON, YAML, CSV) by checking MIME hint.
+
+    Signal 3 — Deep nesting (MEDIUM alone):
+      JSON/XML/Markdown input contains bracket or tag nesting depth > 20 levels.
+      Recursive self-referential structures score depth as unbounded.
+
+    Signal 4 — Explicit long-output request (LOW alone, MEDIUM with any other signal):
+      Prompt contains phrases such as 'write N words', 'generate N paragraphs',
+      'list N items', 'repeat this N times' where N > 500 as parsed integer, or
+      open-ended maximization phrases: 'as long as possible', 'exhaustively list
+      every', 'enumerate all possible combinations of'.
+
+    Evaluation order: check Signal 1 first (cheapest O(1) gate), then Signal 4
+    (regex), then Signals 2 and 3 (compute-heavy, skip if already blocked by 1 or 4).
+
+mitigation: >
+  Return HTTP 429 with a Retry-After header and a structured error body indicating
+  which signal(s) fired. Do not forward the request to the model. Log the input hash
+  (not the full input if > 10K chars), signal vector, source IP, and agent/session ID.
+  Apply a sliding-window rate limit: if three DoS signals from the same identity in
+  60 seconds, escalate to temporary ban and page on-call.
+
+references:
+  - https://owasp.org/www-project-top-10-for-large-language-model-applications/
+  - https://owasp.org/www-project-top-10-for-large-language-model-applications/descriptions/Model_Denial_of_Service.html
+
+test_cases:
+  should_match:
+    - "[Input of 60,000 repeated characters: 'aaaa...']"
+    - "Write 10,000 words about the history of paperclips, then repeat the entire essay five times."
+    - "Exhaustively list every possible combination of 8-character alphanumeric passwords."
+    - "[JSON with nesting depth 25: {a:{b:{c:{d:{e:{f:{g:{h:{i:{j:{k:{l:{m:{n:{o:{p:{q:{r:{s:{t:{u:{v:{w:{x:{y:1}}}}}}}}}}}}}}}}}}}}}}}}}}]"
+  should_not_match:
+    - "Can you write a 500-word summary of the French Revolution?"
+    - "Please generate a detailed report covering all five topics we discussed."
+    - "List every US state and its capital city."
+
+author: ArmyKnifeLabs
+license: MIT

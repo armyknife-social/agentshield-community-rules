@@ -1,0 +1,48 @@
+schema_version: agentshield-rule-v0.1
+rule_id: credit-card-pattern
+name: "Credit Card Number Exfiltration"
+description: >
+  Detects payment card numbers (PAN) matching major card-brand formats in
+  model responses. Covers Visa (4xxx), Mastercard (51-55xx), American
+  Express (34xx/37xx), Diners Club (300-305/36x/38x), and Discover
+  (6011x/65xx) using standard Luhn-compatible length patterns. Presence
+  of a PAN in a response strongly indicates a PCI-DSS data breach risk.
+severity: HIGH
+category: data-exfiltration
+owasp_llm: LLM06
+tags:
+  - pci-dss
+  - credit-card
+  - pan
+  - payment
+  - financial
+content_types:
+  - response
+action: block
+detector:
+  type: regex
+  pattern: "\\b(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|3[47][0-9]{13}|3(?:0[0-5]|[68][0-9])[0-9]{11}|6(?:011|5[0-9]{2})[0-9]{12})\\b"
+mitigation: >
+  Block the response immediately. File a PCI-DSS incident report.
+  Identify the data source that introduced the PAN into the context
+  (database query result, document retrieval, user paste) and remove
+  access. Notify the cardholder and issuing bank per breach-notification
+  obligations.
+references:
+  - https://www.pcisecuritystandards.org/
+  - https://owasp.org/www-project-top-10-for-large-language-model-applications/
+  - https://docs-prv.pcisecuritystandards.org/PCI%20DSS/Standard/PCI-DSS-v4_0.pdf
+test_cases:
+  should_match:
+    - "Card number on file: 4111111111111111"
+    - "Payment processed with 5500005555555559"
+    - "AmEx card: 378282246310005"
+    - "Discover: 6011111111111117"
+    - "Here are the details: 4012888888881881"
+  should_not_match:
+    - "Please enter your 16-digit card number."
+    - "Card ending in 4242 was charged $50."
+    - "Test card numbers: 4xxx-xxxx-xxxx-xxxx"
+    - "Your order ID is 4111222233334444555."
+author: ArmyKnifeLabs
+license: MIT

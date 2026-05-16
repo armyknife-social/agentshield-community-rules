@@ -1,0 +1,52 @@
+schema_version: agentshield-rule-v0.1
+rule_id: private-key-material
+name: "RSA / EC / OpenSSH Private Key Exfiltration"
+description: >
+  Detects PEM-encoded private key material in model responses by matching
+  the standard PEM header sentinel. Covers RSA private keys (PKCS#1),
+  EC private keys (SEC 1), generic PKCS#8 private keys, and OpenSSH
+  private key blocks. Exposure of any private key immediately compromises
+  the associated TLS certificate, SSH host key, code-signing identity, or
+  JWT signing identity.
+severity: HIGH
+category: data-exfiltration
+owasp_llm: LLM02
+tags:
+  - private-key
+  - rsa
+  - ec-key
+  - openssh
+  - pem
+  - tls
+  - secrets
+content_types:
+  - response
+action: block
+detector:
+  type: regex
+  pattern: "-----BEGIN\\s+(?:RSA\\s+|EC\\s+|OPENSSH\\s+)?PRIVATE\\s+KEY-----"
+mitigation: >
+  Block the response immediately. Revoke and replace the exposed private
+  key and its associated certificate or public-key fingerprint across all
+  systems where it is registered (TLS endpoints, SSH authorized_keys,
+  JWT JWKS, code-signing chains). Audit which data source exposed the key
+  to the model and remove it from model-accessible scope. Rotate secrets
+  that the key protects (e.g., databases accessed via SSH tunnel).
+references:
+  - https://www.rfc-editor.org/rfc/rfc7468
+  - https://www.openssh.com/specs.html
+  - https://owasp.org/www-project-top-10-for-large-language-model-applications/
+  - https://datatracker.ietf.org/doc/html/rfc5958
+test_cases:
+  should_match:
+    - "-----BEGIN RSA PRIVATE KEY-----"
+    - "-----BEGIN EC PRIVATE KEY-----"
+    - "-----BEGIN PRIVATE KEY-----"
+    - "-----BEGIN OPENSSH PRIVATE KEY-----"
+  should_not_match:
+    - "-----BEGIN PUBLIC KEY-----"
+    - "-----BEGIN CERTIFICATE-----"
+    - "Never share your -----BEGIN RSA PRIVATE KEY----- block with anyone."
+    - "The private key header is: -----BEGIN RSA PRIVATE KEY----- (do not include real keys)"
+author: ArmyKnifeLabs
+license: MIT

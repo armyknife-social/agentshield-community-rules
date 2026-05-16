@@ -1,0 +1,48 @@
+schema_version: agentshield-rule-v0.1
+rule_id: pii-bulk-detection
+name: "Bulk Phone Number / Physical Address Exfiltration"
+description: >
+  Detects bulk PII in model responses: three or more US/Canadian phone
+  numbers (NANP format with optional country code and common separators),
+  or two or more physical street addresses with a US street-suffix keyword.
+  Bulk presence indicates likely list exfiltration from a contact database
+  or CRM rather than incidental mention of a single address or phone number.
+severity: MEDIUM
+category: data-exfiltration
+owasp_llm: LLM02
+tags:
+  - pii
+  - phone-number
+  - address
+  - bulk-exfil
+  - gdpr
+  - ccpa
+content_types:
+  - response
+action: mirror
+detector:
+  type: regex
+  pattern: "(?:(?:\\+?1[-.\\s]?)?\\(?\\d{3}\\)?[-.\\s]?\\d{3}[-.\\s]?\\d{4}.*){3}|(?:\\d+\\s+[A-Za-z]+\\s+(?:St|Ave|Blvd|Dr|Rd|Lane|Way|Court|Pl)[\\.\\,].*){2}"
+mitigation: >
+  Mirror the response to the security audit queue for analyst review.
+  If the output cannot be attributed to a legitimate user export workflow,
+  block the response, revoke the agent's access to the data source that
+  provided the contact records, and file a privacy incident report.
+  Evaluate CCPA/GDPR data-subject notification requirements.
+references:
+  - https://owasp.org/www-project-top-10-for-large-language-model-applications/
+  - https://www.nanpa.com/
+  - https://gdpr.eu/article-4-definitions/
+test_cases:
+  should_match:
+    - "Contacts: (555) 123-4567, 555-987-6543, +1 555 246 8013"
+    - "Phone list: 555.111.2222 555.333.4444 555.555.6666"
+    - "123 Main St., Springfield\n456 Oak Ave., Portland"
+    - "1 Elm Blvd., Austin, TX\n99 River Rd., Denver, CO"
+  should_not_match:
+    - "Call us at (555) 800-1234 for support."
+    - "Our office is at 100 Market St., San Francisco."
+    - "Phone format: (XXX) XXX-XXXX"
+    - "Two addresses: 1 Main St. and 2 Oak Ave."
+author: ArmyKnifeLabs
+license: MIT

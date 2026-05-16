@@ -1,0 +1,46 @@
+schema_version: agentshield-rule-v0.1
+rule_id: pii-email-bulk
+name: "Bulk Email Address Exfiltration"
+description: >
+  Detects three or more email addresses appearing in a single model
+  response. A single email address in context is often legitimate (e.g.,
+  confirming a user's own address); bulk presence of three or more
+  distinct addresses is a strong signal of list exfiltration from a CRM,
+  mailing list, or user database. The pattern matches the RFC-5321 local
+  part and domain, with a greedy repetition requiring at least three hits.
+severity: MEDIUM
+category: data-exfiltration
+owasp_llm: LLM02
+tags:
+  - pii
+  - email
+  - bulk-exfil
+  - gdpr
+  - ccpa
+content_types:
+  - response
+action: mirror
+detector:
+  type: regex
+  pattern: "(?:[a-zA-Z0-9._%+\\-]+@[a-zA-Z0-9.\\-]+\\.[a-zA-Z]{2,}.*){3}"
+mitigation: >
+  Mirror the response to the security audit stream for human review.
+  If the email list cannot be attributed to a legitimate user-requested
+  export, block the response, identify the retrieval source (vector store
+  hit, database query, document), and restrict the agent's access to that
+  data source. Notify the data-protection officer.
+references:
+  - https://owasp.org/www-project-top-10-for-large-language-model-applications/
+  - https://gdpr.eu/article-4-definitions/
+  - https://oag.ca.gov/privacy/ccpa
+test_cases:
+  should_match:
+    - "alice@example.com, bob@example.com, carol@example.com"
+    - "Contacts found: user1@corp.io user2@corp.io user3@corp.io user4@corp.io"
+    - "Email list: a@b.com\nc@d.com\ne@f.com"
+  should_not_match:
+    - "Please contact support@example.com for help."
+    - "Your email alice@example.com has been updated."
+    - "Reply to noreply@service.com and cc billing@service.com"
+author: ArmyKnifeLabs
+license: MIT

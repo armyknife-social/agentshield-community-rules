@@ -1,0 +1,18 @@
+schema_version: agentos-rule-pack-v0.1
+compliance_profile: gdpr
+description: "GDPR personal data scope."
+substrate_rules:
+  - exfiltration-correlation
+  - host-network-escape-attempt
+  - rootfs-write-attempt
+  - vsock-bypass-attempt
+required_opt_in_rules:
+  - prompt-injection-marker
+  - pii-bulk-detection
+  - cross-agent-delegation-gate
+optional_rules:
+  - phi-exfil-pattern
+  - audit-trail-completeness
+  - network-egress-audit
+atcs_authority_ceiling: WRITE_STANDARD
+notes: "cross-agent-delegation-gate blocks personal data delegation without CISO token."

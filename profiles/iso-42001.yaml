@@ -1,0 +1,15 @@
+schema_version: agentos-rule-pack-v0.1
+compliance_profile: iso-42001
+description: "ISO/IEC 42001 AI management system requirements."
+substrate_rules:
+  - exfiltration-correlation
+  - host-network-escape-attempt
+  - rootfs-write-attempt
+  - vsock-bypass-attempt
+required_opt_in_rules:
+  - prompt-injection-marker
+  - ai-system-boundary-check
+optional_rules:
+  - audit-trail-completeness
+  - pii-bulk-detection
+atcs_authority_ceiling: WRITE_STANDARD

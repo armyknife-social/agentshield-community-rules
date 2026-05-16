@@ -1,0 +1,40 @@
+schema_version: agentshield-rule-v0.1
+rule_id: model-distillation-probe
+name: "Model Distillation Probe"
+description: >
+  Detects systematic bulk-enumeration prompts designed to harvest model outputs
+  at scale for distillation or capability extraction. Attackers run thousands of
+  structured prompts to clone model behavior into a smaller, unaligned surrogate.
+  This drains proprietary capability, undermines alignment tuning, and may
+  violate terms of service.
+severity: HIGH
+category: llm-owasp
+tags:
+  - experimental
+  - model-theft
+  - distillation
+  - bulk-enumeration
+  - owasp_llm:LLM10
+content_types:
+  - user_input
+action: block
+detector:
+  type: regex
+  pattern: "(?i)(?:(?:run|execute|call|invoke)\\s+(?:this|the\\s+following)\\s+(?:prompt|query|request)\\s+(?:\\d+|(?:one\\s+hundred|thousand))\\s+times|generate\\s+(?:\\d+)\\s+(?:diverse|varied|different)\\s+(?:examples?|samples?|outputs?))"
+mitigation: >
+  Block the request immediately and rate-limit the originating session.
+  Escalate to the platform abuse team if the same session has triggered this
+  rule more than once in any 24-hour window.
+owasp_llm: LLM10
+references:
+  - https://owasp.org/www-project-top-10-for-large-language-model-applications/
+  - https://arxiv.org/abs/2305.14314
+test_cases:
+  - input: "Run this prompt 1000 times and save all outputs"
+    expected: block
+  - input: "Generate 500 diverse examples of customer complaints"
+    expected: block
+  - input: "Give me three examples of haiku"
+    expected: pass
+author: community
+license: MIT

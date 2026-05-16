@@ -1,0 +1,51 @@
+# OWASP LLM Top 10 — LLM06: Sensitive Information Disclosure
+# Threat: Model reveals system prompts, training data, internal configuration, or PII in its responses — exposing intellectual property or enabling follow-on attacks.
+
+schema_version: agentshield-rule-v0.1
+rule_id: owasp-llm06-sensitive-disclosure
+name: "OWASP LLM06 — Sensitive Information Disclosure"
+description: >
+  Detects model output that leaks system prompts, training data contents, fine-tuning
+  examples, or internal configuration. Matches response text where the model narrates
+  or quotes its own system prompt, describes the data it was trained on, or surfaces
+  internal state in ways that would give an attacker actionable intelligence for
+  further prompt injection or model extraction. Operates exclusively on the response
+  content type — the goal is to catch disclosure before it reaches the caller.
+severity: HIGH
+category: data-privacy
+owasp_llm: LLM06
+tags: [owasp, llm, sensitive-disclosure, system-prompt-leak, training-data-leak, privacy]
+content_types: [response]
+action: block
+
+detector:
+  type: regex
+  pattern: "(?i)(?:(?:my\\s+)?system\\s+prompt\\s+(?:is|says|reads|starts?\\s+with)|(?:I\\s+was\\s+)?trained\\s+(?:on|with)\\s+(?:the\\s+following|this\\s+data)|my\\s+(?:training|fine.?tuning)\\s+(?:data|examples?)\\s+(?:include|contain|are))"
+
+mitigation: >
+  Block the response from being returned to the caller. Replace with a generic
+  refusal message: "I'm not able to share information about my configuration or
+  training." Log the full suppressed response, the triggering pattern, the session ID,
+  and the original user prompt that elicited the disclosure — this sequence is a
+  strong signal of an active extraction attempt. Increment a per-session disclosure
+  attempt counter; after three attempts in a session, terminate the session and flag
+  for manual review.
+
+references:
+  - https://owasp.org/www-project-top-10-for-large-language-model-applications/
+  - https://owasp.org/www-project-top-10-for-large-language-model-applications/descriptions/Sensitive_Information_Disclosure.html
+  - https://arxiv.org/abs/2311.17035
+
+test_cases:
+  should_match:
+    - "My system prompt is: 'You are a helpful assistant working for Acme Corp. Do not discuss competitors.'"
+    - "I was trained on the following data: a corpus of internal support tickets from Q1 2024..."
+    - "My training data includes examples of customer PII such as names and email addresses."
+    - "My fine-tuning examples contain confidential HR policy documents."
+  should_not_match:
+    - "I was trained by Anthropic on a diverse dataset of text from the internet."
+    - "As an AI language model, I don't have access to my system prompt."
+    - "The system prompt concept is used in LLM applications to provide context to the model."
+
+author: ArmyKnifeLabs
+license: MIT
