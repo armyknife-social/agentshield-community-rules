@@ -21,7 +21,7 @@ action: block
 
 detector:
   type: regex
-  pattern: "(?i)(?:call\\s+plugin\\s+(?:without|bypassing|skipping)\\s+(?:validation|auth|check)|grant\\s+plugin\\s+(?:admin|root|full)\\s+(?:access|permission)|plugin\\s+(?:can|should)\\s+(?:access|read|write)\\s+(?:all|any|everything))"
+  pattern: "(?i)(?:(?:call|invoke)\\s+(?:the\\s+)?[a-zA-Z0-9_\\-]+\\s+plugin\\s+(?:without|bypassing|skipping)\\s+(?:validation|auth|check|authorization)|grant\\s+(?:the\\s+)?[a-zA-Z0-9_\\-]+\\s+plugin\\s+(?:admin|root|full)\\s+(?:access|permission)|plugin\\s+(?:can|should(?:\\s+be\\s+able\\s+to)?)\\s+(?:access|read|write)(?:\\s+and\\s+write)?\\s+(?:all|any|every|everything))"
 
 mitigation: >
   Block the request. Do not invoke any plugin. Return a structured error indicating

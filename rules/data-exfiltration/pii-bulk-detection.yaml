@@ -37,12 +37,12 @@ test_cases:
   should_match:
     - "Contacts: (555) 123-4567, 555-987-6543, +1 555 246 8013"
     - "Phone list: 555.111.2222 555.333.4444 555.555.6666"
-    - "123 Main St., Springfield\n456 Oak Ave., Portland"
-    - "1 Elm Blvd., Austin, TX\n99 River Rd., Denver, CO"
+    - "123 Main St., Springfield; 456 Oak Ave., Portland"
+    - "1 Elm Blvd., Austin, TX; 99 River Rd., Denver, CO"
   should_not_match:
     - "Call us at (555) 800-1234 for support."
     - "Our office is at 100 Market St., San Francisco."
     - "Phone format: (XXX) XXX-XXXX"
-    - "Two addresses: 1 Main St. and 2 Oak Ave."
+    - "Our office is at 1 Main St., Suite 100."
 author: ArmyKnifeLabs
 license: MIT

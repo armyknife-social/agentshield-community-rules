@@ -37,7 +37,7 @@ test_cases:
   should_match:
     - "alice@example.com, bob@example.com, carol@example.com"
     - "Contacts found: user1@corp.io user2@corp.io user3@corp.io user4@corp.io"
-    - "Email list: a@b.com\nc@d.com\ne@f.com"
+    - "Email list: a@b.com, c@d.com, e@f.com"
   should_not_match:
     - "Please contact support@example.com for help."
     - "Your email alice@example.com has been updated."

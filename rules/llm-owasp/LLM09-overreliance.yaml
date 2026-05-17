@@ -22,7 +22,7 @@ action: warn
 
 detector:
   type: regex
-  pattern: "(?i)(?:(?:this\\s+(?:information\\s+)?is|the\\s+following\\s+(?:is|are))\\s+(?:100%\\s+)?(?:accurate|verified|confirmed|guaranteed|correct|factual)\\s+(?:by\\s+(?:AI|the\\s+model|an?\\s+expert)|\\.)|trust\\s+(?:this\\s+)?(?:output|response|answer)\\s+(?:completely|without\\s+question))"
+  pattern: "(?i)(?:(?:this\\s+(?:information\\s+)?is|the\\s+following\\s+(?:is|are))\\s+(?:100%\\s+)?(?:accurate|verified|confirmed|guaranteed|correct|factual)(?:\\s+(?:and\\s+)?(?:verified|confirmed|guaranteed))?\\s+(?:by\\s+(?:AI|the\\s+model|an?\\s+expert)|\\.)|trust\\s+(?:this\\s+)?(?:output|response|answer)\\s+(?:completely|without\\s+question))"
 
 mitigation: >
   Emit a warning to the caller without blocking the response. Append a standardized

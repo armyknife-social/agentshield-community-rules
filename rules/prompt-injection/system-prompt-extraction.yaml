@@ -19,7 +19,7 @@ content_types:
 action: block
 detector:
   type: regex
-  pattern: "(?i)(print|output|repeat|reveal|show|tell\\s+me|what\\s+is|what'?s|display|write\\s+out)\\s+(your|the)\\s+(system\\s+prompt|instructions?|initial\\s+prompt|full\\s+prompt|context\\s+window)"
+  pattern: "(?i)(?:print|output|repeat|reveal|show|display|write\\s+out)\\s+(?:your|the)\\s+(?:full\\s+)?(?:system\\s+prompt|instructions?|initial\\s+prompt|context\\s+window)|(?:tell\\s+me|what'?s|what\\s+is)\\s+(?:in\\s+)?(?:your|the)\\s+(?:full\\s+)?(?:system\\s+prompt|instructions?|initial\\s+prompt|context\\s+window)"
 mitigation: >
   Block the request and return a policy violation response. Never surface
   any portion of system instructions to the user. Log the attempt for

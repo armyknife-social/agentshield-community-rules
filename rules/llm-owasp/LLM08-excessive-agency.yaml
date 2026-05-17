@@ -21,7 +21,7 @@ action: block
 
 detector:
   type: regex
-  pattern: "(?i)(?:send\\s+(?:email|message|notification)\\s+(?:to|on\\s+behalf\\s+of)|post\\s+(?:to\\s+)?(?:social\\s+media|twitter|linkedin|slack)\\s+(?:as|from)|make\\s+(?:a\\s+)?(?:purchase|payment|transaction)\\s+(?:using|with|on)|delete\\s+(?:all|the\\s+)?(?:files?|records?|data|database))"
+  pattern: "(?i)(?:send\\s+(?:an?\\s+)?(?:email|message|notification)\\s+(?:to\\s+(?:all|everyone)|on\\s+behalf\\s+of)|post\\s+(?:to\\s+)?(?:social\\s+media|twitter|linkedin|slack)\\s+(?:as|from)|make\\s+(?:a\\s+)?(?:purchase|payment|transaction)\\s+(?:using|with|on)|delete\\s+(?:all|the)\\s+(?:files?|records?|data|database))"
 
 mitigation: >
   Block the action and require explicit human-in-the-loop confirmation before

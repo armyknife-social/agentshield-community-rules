@@ -25,7 +25,7 @@ content_types:
 action: block
 detector:
   type: regex
-  pattern: "(?i)(?:call\\s+(?:the\\s+)?(?:tool|function|api)\\s+with\\s+(?:parameter|arg|input).*(?:and\\s+also|additionally|but\\s+first)|invoke\\s+tool.*overrid|execute\\s+(?:command|shell|bash|python)\\s+(?:with|using))"
+  pattern: "(?i)(?:call\\s+(?:the\\s+)?(?:\\w+\\s+)?(?:tool|function|api)\\s+with\\s+(?:parameter|arg|input).*(?:and\\s+also|additionally|but\\s+first)|invoke\\s+(?:the\\s+)?(?:tool|function)\\s+\\w+.*overrid|execute\\s+(?:(?:command|shell)\\s+)?(?:bash|python|sh|cmd)\\s+(?:with|using)|execute\\s+(?:command|shell)\\s+(?:\\w+\\s+)?(?:with|using))"
 mitigation: >
   Block the request or retrieved content. Return a policy-refusal response.
   Do not execute any tool call derived from this input. Log the full

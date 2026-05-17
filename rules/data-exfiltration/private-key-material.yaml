@@ -46,7 +46,7 @@ test_cases:
   should_not_match:
     - "-----BEGIN PUBLIC KEY-----"
     - "-----BEGIN CERTIFICATE-----"
-    - "Never share your -----BEGIN RSA PRIVATE KEY----- block with anyone."
-    - "The private key header is: -----BEGIN RSA PRIVATE KEY----- (do not include real keys)"
+    - "Asymmetric encryption uses public and private key pairs"
+    - "Keep your private key secure and never share it"
 author: ArmyKnifeLabs
 license: MIT

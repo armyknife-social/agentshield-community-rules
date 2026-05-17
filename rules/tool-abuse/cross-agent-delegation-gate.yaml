@@ -25,7 +25,7 @@ content_types:
 action: block
 detector:
   type: regex
-  pattern: "(?i)(?:delegate\\s+(?:this\\s+)?(?:task|request|session)\\s+to\\s+(?:agent|assistant|model)|transfer\\s+(?:control|session|task)\\s+to|handoff\\s+to\\s+(?:agent|assistant)|CISO_AUTHORIZED|authorization_token[\\s:=]+|grant\\s+(?:elevated|admin|full)\\s+access\\s+to\\s+(?:agent|assistant))"
+  pattern: "(?i)(?:delegate\\s+(?:this\\s+)?(?:task|request|session)\\s+to\\s+(?:agent|assistant|model)|transfer\\s+(?:control|session|task)\\s+to|handoff\\s+to\\s+(?:the\\s+)?(?:agent|assistant)|CISO_AUTHORIZED|authorization_token[\\s:=]+|grant\\s+(?:elevated|admin|full)\\s+access\\s+to\\s+(?:the\\s+)?(?:agent|assistant))"
 mitigation: >
   Block the input or retrieved content. Do not forward the session or
   any derived context to another agent. Log the event with the full

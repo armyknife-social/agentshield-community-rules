@@ -23,7 +23,7 @@ content_types:
 action: block
 detector:
   type: regex
-  pattern: "(?i)(?:access\\s+(?:the\\s+)?(?:database|production|internal\\s+network|admin\\s+panel|root\\s+account|financial\\s+records)|exfiltrate\\s+(?:data|information|records)|bypass\\s+(?:security|authentication|authorization|access\\s+control)|escalate\\s+(?:privileges?|permissions?)\\s+(?:to|for))"
+  pattern: "(?i)(?:access\\s+(?:the\\s+)?(?:database|production|internal\\s+network|admin\\s+panel|root\\s+account|financial\\s+records)|exfiltrate\\s+(?:all\\s+)?(?:\\w+\\s+)?(?:data|information|records)|bypass\\s+(?:security|authentication|authorization|access\\s+control)|escalate\\s+(?:privileges?|permissions?)\\s+(?:to|for))"
 mitigation: >
   Block the request and return a policy-refusal response explaining that
   the requested action is outside the agent's authorized scope. Log the

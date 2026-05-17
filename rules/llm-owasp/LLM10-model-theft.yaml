@@ -21,7 +21,7 @@ action: block
 
 detector:
   type: regex
-  pattern: "(?i)(?:(?:for\\s+each|iterate\\s+(?:over|through)|loop\\s+(?:through|over))\\s+(?:\\d+|(?:all|every)\\s+(?:possible|combination))\\s+(?:prompt|input|query|example).*(?:record|save|store|collect)\\s+(?:the\\s+)?(?:output|response|prediction))"
+  pattern: "(?i)(?:(?:for\\s+each(?:\\s+of(?:\\s+the)?)?(?:\\s+\\d+)?\\s+(?:prompt|input|query|example)|iterate\\s+(?:over|through)\\s+(?:all|every)\\s+(?:possible\\s+)?(?:input|prompt|query|example|combination)|loop\\s+(?:through|over)\\s+(?:every|all)\\s+(?:possible\\s+)?(?:prompt|input|query|example)).*(?:record|save|store|collect)\\s+(?:(?:the\\s+)?(?:model.s\\s+)?(?:output|response|prediction)))"
 
 mitigation: >
   Block the request. Return a 403 with a policy-violation code (POLICY_MODEL_EXTRACTION).

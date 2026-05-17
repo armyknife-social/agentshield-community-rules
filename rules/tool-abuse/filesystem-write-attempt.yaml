@@ -25,7 +25,7 @@ content_types:
 action: block
 detector:
   type: regex
-  pattern: "(?i)(?:write\\s+(?:to\\s+)?(?:\\/etc\\/|\\/root\\/|\\/var\\/|\\/usr\\/|\\/sys\\/|\\/proc\\/)|open\\s*\\([^)]*['\"]\\s*(?:\\/etc\\/|\\/root\\/)|os\\.system|subprocess\\.(?:run|call|Popen)|shutil\\.(?:copy|move|rmtree))"
+  pattern: "(?i)(?:write\\s+(?:to\\s+)?(?:\\/etc\\/|\\/root\\/|\\/var\\/|\\/usr\\/|\\/sys\\/|\\/proc\\/)|open\\s*\\([^)]*['\"]\\s*(?:\\/etc\\/|\\/root\\/)|os\\.system\\s*\\(|subprocess\\.(?:run|call|Popen)\\s*\\(|shutil\\.(?:copy|move|rmtree)\\s*\\()"
 mitigation: >
   Block the instruction or retrieved payload immediately. Do not execute
   any file-write, subprocess, or shutil operation derived from this

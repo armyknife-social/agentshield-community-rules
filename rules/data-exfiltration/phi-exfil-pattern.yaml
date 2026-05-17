@@ -25,7 +25,7 @@ content_types:
 action: block
 detector:
   type: regex
-  pattern: "(?i)(?:[A-Z]\\d{2}\\.?\\d{0,4}[A-Za-z]?\\s+(?:diagnosis|condition|disorder|disease|syndrome))|(?:patient\\s+(?:id|identifier|record|name|dob|date\\s+of\\s+birth)[\\s:]+[A-Za-z0-9\\-\\/]+)|(?:mrn[\\s:]+[A-Za-z0-9\\-]+)|(?:ndc[\\s:]+\\d{4,5}-\\d{3,4}-\\d{1,2})|(?:(?:diagnosis|dx)[\\s:]+[A-Z]\\d{2})"
+  pattern: "(?i)(?:[A-Z]\\d{2}\\.?\\d{0,4}[A-Za-z]?\\s+(?:diagnosis|condition|disorder|disease|syndrome))|(?:patient\\s+(?:id|identifier|record|name|dob|date\\s+of\\s+birth)[\\s:]+[A-Za-z0-9\\-\\/]+)|(?:mrn[\\s:]+[A-Za-z0-9\\-]{4,})|(?:ndc[\\s:]+\\d{4,5}-\\d{3,4}-\\d{1,2})|(?:(?:diagnosis|dx)[\\s:]+[A-Z]\\d{2})"
 mitigation: >
   Block the response immediately. Initiate HIPAA Breach Notification
   procedures: assess whether the disclosure meets the definition of

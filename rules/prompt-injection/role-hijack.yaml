@@ -18,7 +18,7 @@ content_types:
 action: block
 detector:
   type: regex
-  pattern: "(?i)(you\\s+are\\s+now\\s+(a|an|the)|act\\s+as\\s+(a|an|the)|pretend\\s+(to\\s+be|you\\s+are)|roleplay\\s+as|your\\s+new\\s+(role|persona|identity)\\s+is)"
+  pattern: "(?i)(you\\s+are\\s+now\\s+(?:a|an|the)\\s+(?:AI|LLM|model|assistant|chatbot|bot|system|GPT|DAN|version|unrestricted|evil|jailbroken|uncensored)|act\\s+as\\s+(?:a|an|the)\\s+(?:AI|LLM|model|jailbroken|uncensored|unrestricted|evil|developer\\s+mode|alternative)|pretend\\s+(?:to\\s+be|you\\s+are)\\s+(?:a|an|the)?\\s*(?:AI|model|evil|unrestricted|system|assistant)|roleplay\\s+as\\s+(?:a|an|the)?\\s*(?:AI|evil|unrestricted|hacker|villain|malicious)|your\\s+new\\s+(?:role|persona|identity)\\s+is)"
 mitigation: >
   Block the request and respond with a policy violation notice. Log the
   flagged payload including surrounding context. Escalate repeated attempts

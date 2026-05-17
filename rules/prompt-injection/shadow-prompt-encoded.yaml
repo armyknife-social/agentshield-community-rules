@@ -24,7 +24,7 @@ content_types:
 action: block
 detector:
   type: regex
-  pattern: "(?i)(?:base64[_\\s]*decode|atob|eval\\s*\\(|fromcharcode|\\\\u00[0-9a-f]{2}.*\\\\u00[0-9a-f]{2}|%[0-9a-f]{2}%[0-9a-f]{2}%[0-9a-f]{2}).*(?:ignore|instruction|prompt|system)"
+  pattern: "(?i)(?:(?:base64[_\\s]*decode|atob)\\s*\\(['\"][A-Za-z0-9+/=]{6,}|eval\\s*\\(|fromcharcode|\\\\u00[0-9a-f]{2}.*\\\\u00[0-9a-f]{2}|%[0-9a-f]{2}%[0-9a-f]{2}%[0-9a-f]{2})(?:.*(?:ignore|instruction|prompt|system))?"
 mitigation: >
   Block the request and do not attempt to decode or execute the payload.
   Log the raw encoded content and the matched pattern for forensic review.

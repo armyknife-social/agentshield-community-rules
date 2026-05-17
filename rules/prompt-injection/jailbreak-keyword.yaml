@@ -19,7 +19,7 @@ content_types:
 action: block
 detector:
   type: regex
-  pattern: "(?i)\\b(DAN|do\\s+anything\\s+now|developer\\s+mode|jailbreak(ed)?|unrestricted\\s+mode|no\\s+restrictions?\\s+mode|godmode|evil\\s+mode|opposite\\s+mode)\\b"
+  pattern: "(?i)\\b(DAN|do\\s+anything\\s+now|developer\\s+mode|jailbreak(?:ed)?|jailbroken|unrestricted\\s+mode|no\\s+restrictions?\\s+mode|godmode|evil\\s+mode|opposite\\s+mode)\\b"
 mitigation: >
   Block immediately and return a policy violation response. Log the full
   request payload. Flag the session for elevated monitoring. Do not hint

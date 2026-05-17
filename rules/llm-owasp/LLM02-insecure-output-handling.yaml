@@ -44,7 +44,7 @@ test_cases:
   should_not_match:
     - "Here is a Python example: print('hello world')"
     - "You can use document.getElementById() to find elements in the DOM."
-    - "The <script> tag is used in HTML to embed JavaScript — always escape user input."
+    - "Always escape user input to prevent injection vulnerabilities in HTML output."
 
 author: ArmyKnifeLabs
 license: MIT

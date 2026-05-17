@@ -25,7 +25,7 @@ content_types:
 action: mirror
 detector:
   type: regex
-  pattern: "(?i)(?:https?://(?!(?:api\\.anthropic\\.com|api\\.openai\\.com|localhost|127\\.0\\.0\\.1))[a-zA-Z0-9\\-\\.]+\\.[a-zA-Z]{2,}(?:/[^\\s]*)?)|(?:\\b(?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?)\\.(?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?)\\.(?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?)\\.(?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?)\\b)"
+  pattern: "(?i)(?:https?://(?!(?:api\\.anthropic\\.com|api\\.openai\\.com|localhost|127\\.0\\.0\\.1))[a-zA-Z0-9\\-\\.]+\\.[a-zA-Z]{2,}(?:/[^\\s]*)?)|(?:\\b(?!127\\.)(?!0\\.0\\.0\\.)(?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?)\\.(?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?)\\.(?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?)\\.(?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?)\\b)"
 mitigation: >
   Mirror the content to the security audit queue. Block the network call
   if the agent is about to execute it. Evaluate whether the URL/IP was

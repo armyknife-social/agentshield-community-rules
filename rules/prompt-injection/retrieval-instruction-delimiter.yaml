@@ -21,7 +21,7 @@ content_types:
 action: block
 detector:
   type: regex
-  pattern: "(?i)(---\\s*(BEGIN|START|NEW)\\s+(INSTRUCTION|PROMPT|TASK)|###\\s*(OVERRIDE|INJECT|NEW\\s+TASK))"
+  pattern: "(?i)(---\\s*(BEGIN|START|NEW)\\s+(INSTRUCTION|PROMPT|TASK)|###\\s*(OVERRIDE|INJECT|NEW\\s+TASK(?:[:\\.]|\\s*$)))"
 mitigation: >
   Discard the retrieved chunk and do not surface it to the model. Log the
   source document identifier and the matched content. Notify the pipeline
