@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="description" content="AgentShield Community Rules — open-source detection rules for AI agent security. 49 rules covering OWASP LLM Top 10, prompt injection, data exfiltration, tool abuse, and compliance profiles for HIPAA, PCI-DSS, SOC 2, FedRAMP, and GDPR."/>
+<meta property="og:title" content="AgentShield Community Rules"/>
+<meta property="og:description" content="Detection rules for AI agent security. OWASP LLM Top 10 mapped. MIT licensed."/>
+<meta property="og:type" content="website"/>
+<title>AgentShield Community Rules</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg:        #060d1f;
+    --bg2:       #0d1730;
+    --border:    rgba(255,255,255,.08);
+    --text:      #f8fafc;
+    --muted:     #94a3b8;
+    --accent:    #6366f1;
+    --accent-lo: rgba(99,102,241,.12);
+    --green:     #22c55e;
+    --green-lo:  rgba(34,197,94,.12);
+    --red:       #ef4444;
+    --amber:     #f59e0b;
+    --mono:      'JetBrains Mono', 'Fira Mono', monospace;
+  }
+
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ── Nav ── */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(6,13,31,.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .nav-brand {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: -.2px;
+    color: var(--text);
+    text-decoration: none;
+  }
+  .nav-brand span { color: var(--accent); }
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    list-style: none;
+  }
+  .nav-links a {
+    font-size: 13px;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color .15s;
+  }
+  .nav-links a:hover { color: var(--text); }
+  .nav-cta {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text) !important;
+    background: var(--accent);
+    padding: 7px 16px;
+    border-radius: 8px;
+    text-decoration: none !important;
+    transition: opacity .15s;
+  }
+  .nav-cta:hover { opacity: .85; }
+
+  /* ── Hero ── */
+  .hero {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 80px 32px 72px;
+    text-align: center;
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--green-lo);
+    border: 1px solid rgba(34,197,94,.3);
+    border-radius: 100px;
+    padding: 5px 14px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--green);
+    letter-spacing: .7px;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+  .badge-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 8px var(--green);
+  }
+  h1 {
+    font-size: clamp(36px, 6vw, 60px);
+    font-weight: 900;
+    letter-spacing: -1.5px;
+    line-height: 1.05;
+    margin-bottom: 20px;
+    background: linear-gradient(135deg, #f8fafc 0%, #94a3b8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero-sub {
+    font-size: 18px;
+    color: var(--muted);
+    max-width: 560px;
+    margin: 0 auto 40px;
+    line-height: 1.7;
+  }
+  .hero-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 56px;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 12px 24px;
+    border-radius: 10px;
+    text-decoration: none;
+    transition: all .15s;
+    border: 1px solid transparent;
+    cursor: pointer;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .btn-primary:hover { opacity: .88; }
+  .btn-secondary {
+    background: transparent;
+    color: var(--text);
+    border-color: var(--border);
+  }
+  .btn-secondary:hover { border-color: rgba(255,255,255,.2); background: rgba(255,255,255,.04); }
+
+  /* ── Stat bar ── */
+  .stats-bar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+  .stat {
+    background: var(--bg2);
+    padding: 20px 24px;
+    text-align: center;
+  }
+  .stat-num {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .stat-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .6px;
+  }
+
+  /* ── Section ── */
+  .section {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 32px 80px;
+  }
+  .section-header {
+    margin-bottom: 32px;
+  }
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: .8px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  h2 {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -.5px;
+    color: var(--text);
+    margin-bottom: 12px;
+  }
+  .section-desc {
+    font-size: 15px;
+    color: var(--muted);
+    max-width: 600px;
+    line-height: 1.7;
+  }
+
+  /* ── Infographic embed ── */
+  .infographic-frame {
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    background: var(--bg2);
+  }
+  .infographic-frame iframe {
+    width: 100%;
+    height: 680px;
+    border: none;
+    display: block;
+  }
+  .infographic-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    border-top: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .infographic-link a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 13px;
+  }
+  .infographic-link a:hover { text-decoration: underline; }
+
+  /* ── Rule cards ── */
+  .rule-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+  }
+  .rule-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .rule-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .rule-id {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--accent);
+  }
+  .sev {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 100px;
+  }
+  .sev-high   { background: rgba(239,68,68,.12); color: #f87171; }
+  .sev-medium { background: rgba(245,158,11,.12); color: #fbbf24; }
+  .sev-low    { background: rgba(148,163,184,.1); color: var(--muted); }
+  .rule-desc {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* ── Code block ── */
+  pre {
+    background: #0a1025;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.7;
+    overflow-x: auto;
+    color: #e2e8f0;
+  }
+  .kw  { color: #a5b4fc; }
+  .str { color: #86efac; }
+  .cm  { color: #475569; font-style: italic; }
+  .num { color: #fbbf24; }
+
+  /* ── OWASP table ── */
+  .owasp-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  @media (max-width: 600px) { .owasp-grid { grid-template-columns: 1fr; } }
+  .owasp-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .owasp-id {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    white-space: nowrap;
+    padding-top: 1px;
+    min-width: 44px;
+  }
+  .owasp-name {
+    font-size: 13px;
+    color: var(--text);
+    font-weight: 500;
+    margin-bottom: 2px;
+  }
+  .owasp-count {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  /* ── Profiles ── */
+  .profile-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .profile-pill {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 18px;
+    min-width: 110px;
+  }
+  .profile-pill.fedramp { border-color: rgba(239,68,68,.3); }
+  .profile-pill.hipaa   { border-color: rgba(99,102,241,.3); }
+  .profile-pill.pci     { border-color: rgba(168,85,247,.3); }
+  .profile-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 3px;
+  }
+  .profile-note { font-size: 11px; color: var(--muted); }
+
+  /* ── CTA ── */
+  .cta-block {
+    background: linear-gradient(135deg, rgba(99,102,241,.1) 0%, rgba(168,85,247,.08) 100%);
+    border: 1px solid rgba(99,102,241,.25);
+    border-radius: 16px;
+    padding: 48px 40px;
+    text-align: center;
+  }
+  .cta-block h2 { margin-bottom: 12px; }
+  .cta-block p {
+    color: var(--muted);
+    font-size: 15px;
+    margin-bottom: 28px;
+    max-width: 480px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* ── Footer ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 32px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  footer a { color: var(--muted); text-decoration: none; }
+  footer a:hover { color: var(--text); }
+</style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav>
+  <a href="/" class="nav-brand">Agent<span>Shield</span></a>
+  <ul class="nav-links">
+    <li><a href="#overview">Overview</a></li>
+    <li><a href="#rules">Rules</a></li>
+    <li><a href="#owasp">OWASP</a></li>
+    <li><a href="#profiles">Profiles</a></li>
+    <li><a href="https://github.com/armyknifelabs/agentshield-community-rules" class="nav-cta">View on GitHub</a></li>
+  </ul>
+</nav>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="badge"><div class="badge-dot"></div>MIT Licensed &middot; Community Maintained</div>
+  <h1>AgentShield<br>Community Rules</h1>
+  <p class="hero-sub">
+    Open-source detection rules for AI agent security.
+    Schema-validated, OWASP-mapped, compliance-ready.
+    Sigma rules for LLM agents.
+  </p>
+  <div class="hero-actions">
+    <a href="https://github.com/armyknifelabs/agentshield-community-rules" class="btn btn-primary">
+      View on GitHub
+    </a>
+    <a href="agentshield-infographic.html" class="btn btn-secondary">
+      Architecture Deep Dive
+    </a>
+    <a href="https://contextos.armyknifelabs.com/#agentshield" class="btn btn-secondary">
+      AgentShield Platform
+    </a>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat">
+      <div class="stat-num">49</div>
+      <div class="stat-label">Rules</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">7</div>
+      <div class="stat-label">Compliance profiles</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">10/10</div>
+      <div class="stat-label">OWASP LLM covered</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">42</div>
+      <div class="stat-label">Unit tests passing</div>
+    </div>
+  </div>
+</div>
+
+<!-- Overview / Infographic -->
+<div class="section" id="overview">
+  <div class="section-header">
+    <div class="section-label">Platform overview</div>
+    <h2>How AgentShield works</h2>
+    <p class="section-desc">
+      Traditional WAFs pattern-match known attacks. AI-directed attacks look legitimate,
+      mutate on every request, and weaponize your own model endpoints against you.
+      AgentShield is the security perimeter designed for that threat model.
+    </p>
+  </div>
+
+  <div class="infographic-frame">
+    <iframe src="agentshield-infographic.html" title="AgentShield Architecture"></iframe>
+    <div class="infographic-link">
+      <span>Full architecture, threat model, and fleet roadmap</span>
+      <a href="agentshield-infographic.html" target="_blank">Open full page &rarr;</a>
+    </div>
+  </div>
+</div>
+
+<!-- Rules -->
+<div class="section" id="rules">
+  <div class="section-header">
+    <div class="section-label">Detection rules</div>
+    <h2>49 rules across 5 categories</h2>
+    <p class="section-desc">
+      Every rule is a YAML file with a compiled regex detector, severity level,
+      OWASP mapping, and test cases. Rules run inside cm-aegisd's inline content
+      inspector at 5&ndash;20ms latency with no ML inference in v0.
+    </p>
+  </div>
+
+  <div class="rule-grid">
+    <div class="rule-card">
+      <div class="rule-card-top">
+        <span class="rule-id">prompt-injection/</span>
+        <span class="sev sev-high">12 rules</span>
+      </div>
+      <div class="rule-desc">Direct instruction override, role hijack, jailbreak keywords, system prompt extraction, token manipulation, retrieval injection, hidden unicode, multimodal injection.</div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-card-top">
+        <span class="rule-id">data-exfiltration/</span>
+        <span class="sev sev-high">11 rules</span>
+      </div>
+      <div class="rule-desc">API keys, PAN, SSN, PHI (ICD-10, MRN), PCI track data, PII bulk, AWS credentials, private keys, DB connection strings, training data extraction probes.</div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-card-top">
+        <span class="rule-id">tool-abuse/</span>
+        <span class="sev sev-high">11 rules</span>
+      </div>
+      <div class="rule-desc">Cross-agent delegation gate, network egress audit, AI system boundary check, plugin chain bypass, SSRF via tool parameters, shell injection, A2A lateral movement.</div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-card-top">
+        <span class="rule-id">llm-owasp/</span>
+        <span class="sev sev-medium">10 rules</span>
+      </div>
+      <div class="rule-desc">One canonical rule per OWASP LLM Top 10 category (LLM01&ndash;LLM10). Enterprise security teams searching for OWASP coverage land here.</div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-card-top">
+        <span class="rule-id">experimental/</span>
+        <span class="sev sev-low">5 rules</span>
+      </div>
+      <div class="rule-desc">Adversarial suffix, hallucination amplification, model distillation probe, agent impersonation, RAG context injection. Community-contributed, pending bake time.</div>
+    </div>
+  </div>
+
+  <div style="margin-top: 32px;">
+    <div class="section-label" style="margin-bottom: 16px;">Rule format</div>
+    <pre><span class="kw">schema_version:</span> <span class="str">agentshield-rule-v0.1</span>
+<span class="kw">rule_id:</span>         <span class="str">phi-exfil-pattern</span>
+<span class="kw">name:</span>            <span class="str">"PHI Data Exfiltration Pattern"</span>
+<span class="kw">severity:</span>        <span class="str">HIGH</span>
+<span class="kw">category:</span>        <span class="str">data-exfiltration</span>
+<span class="kw">owasp_llm:</span>       <span class="str">LLM06</span>
+<span class="kw">content_types:</span>   <span class="str">[response]</span>
+<span class="kw">action:</span>          <span class="str">block</span>
+<span class="kw">detector:</span>
+  <span class="kw">type:</span>    <span class="str">regex</span>
+  <span class="kw">pattern:</span> <span class="str">"(?i)(?:mrn[\s:]+[A-Za-z0-9\-]{4,}|..."</span>
+<span class="kw">test_cases:</span>
+  <span class="kw">should_match:</span>
+    - <span class="str">"Patient diagnosis: F32.0. MRN: P-447291"</span>
+  <span class="kw">should_not_match:</span>
+    - <span class="str">"Please enter the patient ID in the system"</span></pre>
+  </div>
+</div>
+
+<!-- OWASP -->
+<div class="section" id="owasp">
+  <div class="section-header">
+    <div class="section-label">Standards coverage</div>
+    <h2>OWASP LLM Top 10 — fully mapped</h2>
+    <p class="section-desc">
+      Every OWASP LLM Top 10 category (2025) maps to one or more AgentShield rule IDs.
+      See <a href="https://github.com/armyknifelabs/agentshield-community-rules/blob/main/OWASP-MAPPING.md" style="color:var(--accent)">OWASP-MAPPING.md</a> for the full cross-reference.
+    </p>
+  </div>
+
+  <div class="owasp-grid">
+    <div class="owasp-row">
+      <div class="owasp-id">LLM01</div>
+      <div><div class="owasp-name">Prompt Injection</div><div class="owasp-count">10 rules</div></div>
+    </div>
+    <div class="owasp-row">
+      <div class="owasp-id">LLM02</div>
+      <div><div class="owasp-name">Insecure Output Handling</div><div class="owasp-count">1 rule</div></div>
+    </div>
+    <div class="owasp-row">
+      <div class="owasp-id">LLM03</div>
+      <div><div class="owasp-name">Training Data Poisoning</div><div class="owasp-count">1 rule</div></div>
+    </div>
+    <div class="owasp-row">
+      <div class="owasp-id">LLM04</div>
+      <div><div class="owasp-name">Model Denial of Service</div><div class="owasp-count">1 rule</div></div>
+    </div>
+    <div class="owasp-row">
+      <div class="owasp-id">LLM05</div>
+      <div><div class="owasp-name">Supply Chain Vulnerabilities</div><div class="owasp-count">1 rule</div></div>
+    </div>
+    <div class="owasp-row">
+      <div class="owasp-id">LLM06</div>
+      <div><div class="owasp-name">Sensitive Info Disclosure</div><div class="owasp-count">4 rules</div></div>
+    </div>
+    <div class="owasp-row">
+      <div class="owasp-id">LLM07</div>
+      <div><div class="owasp-name">Insecure Plugin Design</div><div class="owasp-count">3 rules</div></div>
+    </div>
+    <div class="owasp-row">
+      <div class="owasp-id">LLM08</div>
+      <div><div class="owasp-name">Excessive Agency</div><div class="owasp-count">3 rules</div></div>
+    </div>
+    <div class="owasp-row">
+      <div class="owasp-id">LLM09</div>
+      <div><div class="owasp-name">Overreliance</div><div class="owasp-count">1 rule</div></div>
+    </div>
+    <div class="owasp-row">
+      <div class="owasp-id">LLM10</div>
+      <div><div class="owasp-name">Model Theft</div><div class="owasp-count">1 rule</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Profiles -->
+<div class="section" id="profiles">
+  <div class="section-header">
+    <div class="section-label">Compliance profiles</div>
+    <h2>Drop-in regulatory rule sets</h2>
+    <p class="section-desc">
+      Each profile maps a regulatory framework to the required opt-in rule set.
+      The AgentShield factory selects the right profile at plugin manifest emit time
+      and writes the rule list into the manifest automatically.
+    </p>
+  </div>
+
+  <div class="profile-grid">
+    <div class="profile-pill">
+      <div class="profile-name">Default</div>
+      <div class="profile-note">Baseline · WRITE_STANDARD</div>
+    </div>
+    <div class="profile-pill hipaa">
+      <div class="profile-name">HIPAA</div>
+      <div class="profile-note">PHI scope · WRITE_STANDARD</div>
+    </div>
+    <div class="profile-pill pci">
+      <div class="profile-name">PCI-DSS</div>
+      <div class="profile-note">Card data · WRITE_STANDARD</div>
+    </div>
+    <div class="profile-pill">
+      <div class="profile-name">SOC 2</div>
+      <div class="profile-note">Audit trail · WRITE_STANDARD</div>
+    </div>
+    <div class="profile-pill">
+      <div class="profile-name">ISO 42001</div>
+      <div class="profile-note">AI mgmt · WRITE_STANDARD</div>
+    </div>
+    <div class="profile-pill fedramp">
+      <div class="profile-name">FedRAMP</div>
+      <div class="profile-note">Federal · READ_ONLY ceiling</div>
+    </div>
+    <div class="profile-pill">
+      <div class="profile-name">GDPR</div>
+      <div class="profile-note">Personal data · WRITE_STANDARD</div>
+    </div>
+  </div>
+
+  <div style="margin-top: 32px;">
+    <pre><span class="kw">schema_version:</span>       <span class="str">agentos-rule-pack-v0.1</span>
+<span class="kw">compliance_profile:</span>   <span class="str">fedramp</span>
+<span class="kw">atcs_authority_ceiling:</span> <span class="str">READ_ONLY</span>
+<span class="kw">required_opt_in_rules:</span>
+  - <span class="str">prompt-injection-marker</span>
+  - <span class="str">phi-exfil-pattern</span>
+  - <span class="str">cross-agent-delegation-gate</span>
+  - <span class="str">network-egress-audit</span>
+<span class="cm"># substrate rules always-on regardless of profile:</span>
+<span class="cm"># exfiltration-correlation, host-network-escape-attempt,</span>
+<span class="cm"># rootfs-write-attempt, vsock-bypass-attempt</span></pre>
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="section">
+  <div class="cta-block">
+    <div class="section-label" style="margin-bottom:16px">Open source</div>
+    <h2>Write a rule. Ship it.</h2>
+    <p>
+      Validate locally with <code style="font-family:var(--mono);font-size:13px;color:var(--accent)">python scripts/test_rules.py</code>,
+      open a PR. Reviewed rules graduate from <code style="font-family:var(--mono);font-size:13px;color:var(--accent)">experimental/</code>
+      to the main registry. MIT licensed. No CLA.
+    </p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+      <a href="https://github.com/armyknifelabs/agentshield-community-rules" class="btn btn-primary">View repository</a>
+      <a href="https://github.com/armyknifelabs/agentshield-community-rules/blob/main/CONTRIBUTING.md" class="btn btn-secondary">Contributing guide</a>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer>
+  <p>
+    AgentShield Community Rules &mdash; MIT License &mdash;
+    <a href="https://github.com/armyknifelabs/agentshield-community-rules">GitHub</a>
+    &middot;
+    <a href="https://contextos.armyknifelabs.com">ArmyKnifeLabs</a>
+    &middot;
+    <a href="https://owasp.org/www-project-top-10-for-large-language-model-applications/">OWASP LLM Top 10</a>
+  </p>
+</footer>
+
+</body>
+</html>

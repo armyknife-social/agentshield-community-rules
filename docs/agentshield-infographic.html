@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>AgentShield — AI-Native Security Perimeter</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    font-family:'Inter',system-ui,sans-serif;
+    background:#060d1f;
+    color:#f8fafc;
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+
+  .page{
+    max-width:900px;
+    margin:0 auto;
+    padding:48px 32px 64px;
+  }
+
+  /* ── HERO ── */
+  .hero{
+    text-align:center;
+    padding:0 0 48px;
+    position:relative;
+  }
+  .hero-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    background:rgba(99,102,241,.15);
+    border:1px solid rgba(99,102,241,.4);
+    border-radius:100px;
+    padding:6px 16px;
+    font-size:11px;
+    font-weight:600;
+    color:#a5b4fc;
+    letter-spacing:.8px;
+    text-transform:uppercase;
+    margin-bottom:24px;
+  }
+  .hero-badge span{
+    width:6px;height:6px;
+    border-radius:50%;
+    background:#22c55e;
+    box-shadow:0 0 8px #22c55e;
+    animation:pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
+
+  h1{
+    font-size:clamp(36px,6vw,64px);
+    font-weight:900;
+    line-height:1.05;
+    background:linear-gradient(135deg,#ec4899 0%,#a78bfa 40%,#38bdf8 80%);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    background-clip:text;
+    margin-bottom:16px;
+  }
+  .hero-sub{
+    font-size:18px;
+    color:#94a3b8;
+    font-weight:400;
+    max-width:600px;
+    margin:0 auto 32px;
+    line-height:1.6;
+  }
+  .hero-sub strong{color:#e2e8f0}
+
+  /* ── METRICS ROW ── */
+  .metrics{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:12px;
+    margin-bottom:40px;
+  }
+  .metric{
+    background:linear-gradient(135deg,rgba(255,255,255,.04),rgba(255,255,255,.01));
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:16px;
+    padding:20px 16px;
+    text-align:center;
+    position:relative;
+    overflow:hidden;
+  }
+  .metric::before{
+    content:'';
+    position:absolute;
+    inset:0;
+    border-radius:16px;
+    background:var(--accent);
+    opacity:.06;
+  }
+  .metric-val{
+    font-size:32px;
+    font-weight:900;
+    color:var(--col);
+    line-height:1;
+    margin-bottom:6px;
+  }
+  .metric-label{
+    font-size:10px;
+    font-weight:600;
+    color:#64748b;
+    text-transform:uppercase;
+    letter-spacing:.6px;
+  }
+
+  /* ── SECTION ── */
+  .section{margin-bottom:36px}
+  .section-title{
+    font-size:11px;
+    font-weight:700;
+    color:#64748b;
+    text-transform:uppercase;
+    letter-spacing:1.2px;
+    margin-bottom:16px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .section-title::after{
+    content:'';flex:1;
+    height:1px;
+    background:rgba(255,255,255,.06);
+  }
+
+  /* ── RULES GRID ── */
+  .rules-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+  }
+  .rule-card{
+    background:rgba(255,255,255,.03);
+    border:1px solid rgba(255,255,255,.07);
+    border-left:3px solid var(--c);
+    border-radius:10px;
+    padding:14px 16px;
+    display:flex;
+    align-items:flex-start;
+    gap:12px;
+  }
+  .rule-icon{font-size:20px;flex-shrink:0;margin-top:1px}
+  .rule-name{font-size:12px;font-weight:700;color:#e2e8f0;margin-bottom:3px}
+  .rule-desc{font-size:10px;color:#64748b;line-height:1.5}
+  .rule-tag{
+    display:inline-block;
+    font-size:8px;font-weight:700;
+    padding:2px 6px;border-radius:4px;
+    text-transform:uppercase;letter-spacing:.4px;
+    margin-top:4px;
+  }
+
+  /* ── OWASP TABLE ── */
+  .owasp-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr;
+    gap:8px;
+  }
+  .owasp-item{
+    background:rgba(255,255,255,.03);
+    border:1px solid rgba(255,255,255,.07);
+    border-radius:10px;
+    padding:12px 14px;
+  }
+  .owasp-code{
+    font-size:9px;font-weight:700;
+    color:#f59e0b;letter-spacing:.4px;
+    margin-bottom:4px;
+  }
+  .owasp-name{font-size:11px;font-weight:600;color:#e2e8f0;margin-bottom:4px}
+  .owasp-shield{font-size:9px;color:#64748b}
+  .owasp-shield strong{color:#22c55e}
+
+  /* ── CHAIN VISUAL ── */
+  .chain{
+    display:flex;
+    align-items:center;
+    gap:0;
+    background:rgba(255,255,255,.02);
+    border:1px solid rgba(255,255,255,.07);
+    border-radius:14px;
+    padding:20px 24px;
+    overflow-x:auto;
+  }
+  .chain-node{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:6px;
+    flex-shrink:0;
+  }
+  .chain-icon{
+    width:44px;height:44px;
+    border-radius:12px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:18px;
+    border:1px solid rgba(255,255,255,.12);
+  }
+  .chain-label{font-size:9px;font-weight:600;color:#64748b;text-align:center;max-width:70px}
+  .chain-sub{font-size:8px;color:#374151;text-align:center;max-width:70px}
+  .chain-arrow{
+    color:#374151;font-size:18px;
+    margin:0 4px;flex-shrink:0;
+    padding-bottom:14px;
+  }
+  .chain-signed{
+    font-size:7px;font-weight:700;
+    padding:2px 5px;border-radius:3px;
+    text-transform:uppercase;letter-spacing:.3px;
+  }
+
+  /* ── ROADMAP ── */
+  .roadmap{
+    display:grid;
+    grid-template-columns:repeat(6,1fr);
+    gap:8px;
+  }
+  .roadmap-item{
+    border-radius:12px;
+    padding:16px 12px;
+    text-align:center;
+    border:1px solid rgba(255,255,255,.07);
+  }
+  .roadmap-phase{
+    font-size:8px;font-weight:700;
+    text-transform:uppercase;letter-spacing:.6px;
+    margin-bottom:8px;
+  }
+  .roadmap-icon{font-size:24px;margin-bottom:6px}
+  .roadmap-name{font-size:11px;font-weight:700;color:#e2e8f0;margin-bottom:4px}
+  .roadmap-role{font-size:9px;color:#475569;line-height:1.4}
+  .roadmap-status{
+    display:inline-block;
+    font-size:7px;font-weight:700;
+    padding:2px 6px;border-radius:4px;
+    margin-top:6px;
+    text-transform:uppercase;letter-spacing:.3px;
+  }
+
+  /* ── SUPPLY CHAIN ── */
+  .supply{
+    display:grid;
+    grid-template-columns:1fr auto 1fr;
+    gap:16px;
+    align-items:center;
+    background:rgba(255,255,255,.02);
+    border:1px solid rgba(255,255,255,.07);
+    border-radius:14px;
+    padding:24px;
+  }
+  .supply-side{border-radius:10px;padding:16px}
+  .supply-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px}
+  .supply-item{font-size:11px;color:#94a3b8;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+  .supply-arrow{font-size:28px;color:#374151;text-align:center}
+  .supply-win{
+    font-size:11px;color:#22c55e;font-weight:600;
+    text-align:center;
+  }
+
+  /* ── STATS ROW ── */
+  .stats-row{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:12px;
+    margin-bottom:36px;
+  }
+  .stat-card{
+    background:linear-gradient(135deg,rgba(255,255,255,.04),rgba(255,255,255,.01));
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:14px;
+    padding:20px;
+  }
+  .stat-card-icon{font-size:24px;margin-bottom:10px}
+  .stat-card-title{font-size:13px;font-weight:700;color:#e2e8f0;margin-bottom:6px}
+  .stat-card-body{font-size:11px;color:#64748b;line-height:1.6}
+  .stat-card-body strong{color:#94a3b8}
+
+  /* ── FOOTER ── */
+  .footer{
+    text-align:center;
+    padding-top:32px;
+    border-top:1px solid rgba(255,255,255,.06);
+  }
+  .footer-logo{
+    font-size:22px;font-weight:900;
+    background:linear-gradient(135deg,#ec4899,#a78bfa,#38bdf8);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+    margin-bottom:8px;
+  }
+  .footer-tagline{font-size:11px;color:#374151}
+  .tags{
+    display:flex;flex-wrap:wrap;justify-content:center;
+    gap:6px;margin-top:16px;
+  }
+  .tag{
+    font-size:9px;font-weight:600;
+    padding:4px 10px;border-radius:100px;
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.08);
+    color:#64748b;
+    letter-spacing:.3px;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-badge"><span></span>Phase 4 — Production</div>
+    <h1>AgentShield</h1>
+    <p class="hero-sub">
+      Runtime security for AI agents. <strong>Every session attested. Every anomaly signed. Every audit cryptographically verifiable.</strong>
+      Built for the era when AI agents act autonomously in production.
+    </p>
+  </div>
+
+  <!-- KEY METRICS -->
+  <div class="metrics">
+    <div class="metric" style="--accent:linear-gradient(135deg,#22c55e,#16a34a);--col:#22c55e">
+      <div class="metric-val">71ms</div>
+      <div class="metric-label">Termination latency<br>Phase 4 acceptance</div>
+    </div>
+    <div class="metric" style="--accent:linear-gradient(135deg,#3b82f6,#1d4ed8);--col:#60a5fa">
+      <div class="metric-val">6</div>
+      <div class="metric-label">Anomaly rules<br>4 substrate · 2 opt-in</div>
+    </div>
+    <div class="metric" style="--accent:linear-gradient(135deg,#ec4899,#be185d);--col:#f472b6">
+      <div class="metric-val">7/7</div>
+      <div class="metric-label">Acceptance scenarios<br>A through G — PASS</div>
+    </div>
+    <div class="metric" style="--accent:linear-gradient(135deg,#a78bfa,#7c3aed);--col:#c4b5fd">
+      <div class="metric-val">Ed25519</div>
+      <div class="metric-label">Signed receipts<br>YubiKey trust root</div>
+    </div>
+  </div>
+
+  <!-- RULES -->
+  <div class="section">
+    <div class="section-title">Anomaly Rules</div>
+    <div class="rules-grid">
+      <div class="rule-card" style="--c:#ef4444">
+        <div class="rule-icon">🔍</div>
+        <div>
+          <div class="rule-name">exfiltration-correlation</div>
+          <div class="rule-desc">Data leaving the session in patterns consistent with theft — bulk reads, structured serialization, large egress payloads.</div>
+          <span class="rule-tag" style="background:rgba(239,68,68,.15);color:#fca5a5">Substrate · Always-on</span>
+        </div>
+      </div>
+      <div class="rule-card" style="--c:#f59e0b">
+        <div class="rule-icon">🌐</div>
+        <div>
+          <div class="rule-name">host-network-escape-attempt</div>
+          <div class="rule-desc">Session reaching outside its declared egress allowlist. Every outbound connection must be pre-approved in the signed manifest.</div>
+          <span class="rule-tag" style="background:rgba(245,158,11,.15);color:#fcd34d">Substrate · Always-on</span>
+        </div>
+      </div>
+      <div class="rule-card" style="--c:#8b5cf6">
+        <div class="rule-icon">💾</div>
+        <div>
+          <div class="rule-name">rootfs-write-attempt</div>
+          <div class="rule-desc">Writes to the microVM base rootfs outside the ephemeral overlay. Rootfs SHA256 is pinned in the YubiKey-signed manifest.</div>
+          <span class="rule-tag" style="background:rgba(139,92,246,.15);color:#c4b5fd">Substrate · Permanent</span>
+        </div>
+      </div>
+      <div class="rule-card" style="--c:#06b6d4">
+        <div class="rule-icon">🔌</div>
+        <div>
+          <div class="rule-name">vsock-bypass-attempt</div>
+          <div class="rule-desc">Opening a vsock channel not declared in the session manifest. vsock is the only authorized host-VM communication path.</div>
+          <span class="rule-tag" style="background:rgba(6,182,212,.15);color:#67e8f9">Substrate · Permanent</span>
+        </div>
+      </div>
+      <div class="rule-card" style="--c:#10b981">
+        <div class="rule-icon">💉</div>
+        <div>
+          <div class="rule-name">prompt-injection-marker</div>
+          <div class="rule-desc">Injected content attempting to override agent instructions. Plugin registers this rule at session spawn time.</div>
+          <span class="rule-tag" style="background:rgba(16,185,129,.15);color:#6ee7b7">Opt-in · Plugin registers</span>
+        </div>
+      </div>
+      <div class="rule-card" style="--c:#ec4899">
+        <div class="rule-icon">📡</div>
+        <div>
+          <div class="rule-name">tap-leak-attempt</div>
+          <div class="rule-desc">Direct access to the TAP network interface, bypassing the egress proxy and its allowlist enforcement entirely.</div>
+          <span class="rule-tag" style="background:rgba(236,72,153,.15);color:#f9a8d4">Opt-in · Plugin registers</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OWASP MAPPING -->
+  <div class="section">
+    <div class="section-title">OWASP LLM Top 10 Coverage</div>
+    <div class="owasp-grid">
+      <div class="owasp-item">
+        <div class="owasp-code">LLM01</div>
+        <div class="owasp-name">Prompt Injection</div>
+        <div class="owasp-shield">Closed by <strong>prompt-injection-marker</strong></div>
+      </div>
+      <div class="owasp-item">
+        <div class="owasp-code">LLM06</div>
+        <div class="owasp-name">Sensitive Info Disclosure</div>
+        <div class="owasp-shield">Closed by <strong>exfiltration-correlation</strong></div>
+      </div>
+      <div class="owasp-item">
+        <div class="owasp-code">LLM07</div>
+        <div class="owasp-name">Insecure Plugin Design</div>
+        <div class="owasp-shield">Closed by <strong>vsock-bypass + tap-leak</strong></div>
+      </div>
+      <div class="owasp-item">
+        <div class="owasp-code">LLM08</div>
+        <div class="owasp-name">Excessive Agency</div>
+        <div class="owasp-shield">Closed by <strong>host-network-escape + rootfs-write</strong></div>
+      </div>
+      <div class="owasp-item">
+        <div class="owasp-code">LLM10</div>
+        <div class="owasp-name">Model Theft</div>
+        <div class="owasp-shield">Closed by <strong>exfiltration-correlation</strong></div>
+      </div>
+      <div class="owasp-item">
+        <div class="owasp-code">LLM05</div>
+        <div class="owasp-name">Supply Chain</div>
+        <div class="owasp-shield">Closed by <strong>YubiKey manifest signing + PGP binary</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RECEIPT CHAIN -->
+  <div class="section">
+    <div class="section-title">Cryptographic Audit Chain — Every Session</div>
+    <div class="chain">
+      <div class="chain-node">
+        <div class="chain-icon" style="background:rgba(99,102,241,.15);border-color:rgba(99,102,241,.3)">🗝️</div>
+        <div class="chain-label">Plugin Installed</div>
+        <span class="chain-signed" style="background:rgba(34,197,94,.1);color:#86efac">✓ daemon key</span>
+      </div>
+      <div class="chain-arrow">→</div>
+      <div class="chain-node">
+        <div class="chain-icon" style="background:rgba(59,130,246,.15);border-color:rgba(59,130,246,.3)">🚀</div>
+        <div class="chain-label">Session Started</div>
+        <span class="chain-signed" style="background:rgba(34,197,94,.1);color:#86efac">✓ ephemeral key</span>
+      </div>
+      <div class="chain-arrow">→</div>
+      <div class="chain-node">
+        <div class="chain-icon" style="background:rgba(16,185,129,.15);border-color:rgba(16,185,129,.3)">🖥️</div>
+        <div class="chain-label">Guest Boot</div>
+        <span class="chain-signed" style="background:rgba(100,116,139,.1);color:#64748b">in-guest</span>
+      </div>
+      <div class="chain-arrow">→</div>
+      <div class="chain-node">
+        <div class="chain-icon" style="background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.3)">⚡</div>
+        <div class="chain-label">Anomaly Detected</div>
+        <span class="chain-signed" style="background:rgba(34,197,94,.1);color:#86efac">✓ daemon key</span>
+      </div>
+      <div class="chain-arrow">→</div>
+      <div class="chain-node">
+        <div class="chain-icon" style="background:rgba(245,158,11,.15);border-color:rgba(245,158,11,.3)">🔒</div>
+        <div class="chain-label">Session Ended</div>
+        <span class="chain-signed" style="background:rgba(34,197,94,.1);color:#86efac">✓ ephemeral key</span>
+      </div>
+      <div class="chain-arrow">→</div>
+      <div class="chain-node">
+        <div class="chain-icon" style="background:rgba(139,92,246,.15);border-color:rgba(139,92,246,.3)">🔍</div>
+        <div class="chain-label">Verify Audit Package</div>
+        <span class="chain-signed" style="background:rgba(34,197,94,.15);color:#22c55e;font-size:8px">PASS</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3 CARDS -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-card-icon">🔑</div>
+      <div class="stat-card-title">YubiKey Trust Root</div>
+      <div class="stat-card-body">Every plugin bundle signed by the founder's <strong>PIV slot 9a Ed25519 key</strong>. The runtime rejects any manifest whose signature doesn't verify. The private key never leaves the hardware.</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-icon">⛓️</div>
+      <div class="stat-card-title">Firecracker Isolation</div>
+      <div class="stat-card-body">Every agent session runs inside an <strong>attested Firecracker microVM</strong>. Ephemeral rootfs overlay destroyed at session end. Egress only through a cert-pinned allowlist proxy.</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-icon">📋</div>
+      <div class="stat-card-title">Verifiable by Anyone</div>
+      <div class="stat-card-body"><strong>cm-verify-audit-package</strong> walks the full crypto chain from receipt to founder trust root. Any customer or auditor can run it independently — no ArmyKnifeLabs infrastructure required.</div>
+    </div>
+  </div>
+
+  <!-- SUPPLY CHAIN -->
+  <div class="section">
+    <div class="section-title">Supply Chain Hardening</div>
+    <div class="supply">
+      <div class="supply-side" style="background:rgba(239,68,68,.05);border:1px solid rgba(239,68,68,.15)">
+        <div class="supply-label" style="color:#fca5a5">Before</div>
+        <div class="supply-item">⚠️ <span>npm install (unpinned)</span></div>
+        <div class="supply-item">⚠️ <span>No version lock</span></div>
+        <div class="supply-item">⚠️ <span>npm registry trust</span></div>
+        <div class="supply-item">⚠️ <span>No binary verification</span></div>
+      </div>
+      <div>
+        <div class="supply-arrow">→</div>
+        <div class="supply-win" style="font-size:9px;margin-top:4px">Attack surface<br>reduced</div>
+      </div>
+      <div class="supply-side" style="background:rgba(34,197,94,.05);border:1px solid rgba(34,197,94,.15)">
+        <div class="supply-label" style="color:#86efac">After</div>
+        <div class="supply-item">✅ <span>npm not used</span></div>
+        <div class="supply-item">✅ <span>--claude-version required</span></div>
+        <div class="supply-item">✅ <span>PGP-signed GitHub release</span></div>
+        <div class="supply-item">✅ <span>SHA256 lockfile + PROVENANCE.md</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLEET ROADMAP -->
+  <div class="section">
+    <div class="section-title">Fleet Platform Roadmap (EMPIRE-408)</div>
+    <div class="roadmap">
+      <div class="roadmap-item" style="background:rgba(34,197,94,.06);border-color:rgba(34,197,94,.2)">
+        <div class="roadmap-phase" style="color:#22c55e">E1 · Live</div>
+        <div class="roadmap-icon">⚡</div>
+        <div class="roadmap-name">AgentShield</div>
+        <div class="roadmap-role">Session daemon · 6 rules · &lt;200ms</div>
+        <span class="roadmap-status" style="background:rgba(34,197,94,.15);color:#22c55e">Production</span>
+      </div>
+      <div class="roadmap-item" style="background:rgba(59,130,246,.04)">
+        <div class="roadmap-phase" style="color:#60a5fa">E2</div>
+        <div class="roadmap-icon">🛡️</div>
+        <div class="roadmap-name">Aegis</div>
+        <div class="roadmap-role">Inline content inspector · prompt injection · exfil</div>
+        <span class="roadmap-status" style="background:rgba(59,130,246,.1);color:#93c5fd">Planned</span>
+      </div>
+      <div class="roadmap-item" style="background:rgba(245,158,11,.04)">
+        <div class="roadmap-phase" style="color:#fcd34d">E3</div>
+        <div class="roadmap-icon">⚡</div>
+        <div class="roadmap-name">Hermes</div>
+        <div class="roadmap-role">Agent identity verifier · DID chain · ≤5ms</div>
+        <span class="roadmap-status" style="background:rgba(245,158,11,.1);color:#fde68a">Planned</span>
+      </div>
+      <div class="roadmap-item" style="background:rgba(139,92,246,.04)">
+        <div class="roadmap-phase" style="color:#c4b5fd">E4</div>
+        <div class="roadmap-icon">👁️</div>
+        <div class="roadmap-name">Argus</div>
+        <div class="roadmap-role">Fleet-wide correlator · cross-session campaign detection</div>
+        <span class="roadmap-status" style="background:rgba(139,92,246,.1);color:#ddd6fe">Planned</span>
+      </div>
+      <div class="roadmap-item" style="background:rgba(236,72,153,.04)">
+        <div class="roadmap-phase" style="color:#f9a8d4">E5</div>
+        <div class="roadmap-icon">🐕</div>
+        <div class="roadmap-name">Cerberus</div>
+        <div class="roadmap-role">Ingress gateway · Envoy/WASM · network policy</div>
+        <span class="roadmap-status" style="background:rgba(236,72,153,.1);color:#fbcfe8">Planned</span>
+      </div>
+      <div class="roadmap-item" style="background:rgba(20,184,166,.04)">
+        <div class="roadmap-phase" style="color:#5eead4">E6</div>
+        <div class="roadmap-icon">🦉</div>
+        <div class="roadmap-name">Minerva</div>
+        <div class="roadmap-role">Strategic response · silent block · poison · tarpit</div>
+        <span class="roadmap-status" style="background:rgba(20,184,166,.1);color:#99f6e4">Planned</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- RULES ARCHITECTURE -->
+  <div class="section">
+    <div class="section-title">Rules Architecture — Two-Layer Model</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+      <div style="background:rgba(239,68,68,.04);border:1px solid rgba(239,68,68,.2);border-radius:14px;padding:20px">
+        <div style="font-size:11px;font-weight:700;color:#fca5a5;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px">🔴 Substrate Rules — Always-On</div>
+        <div style="font-size:11px;color:#94a3b8;line-height:1.7;margin-bottom:12px">Four rules fire unconditionally for <strong style="color:#e2e8f0">every session on every AgentOS</strong>. No plugin can disable them. No operator override. They represent the minimum security boundary of the microVM substrate.</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;align-items:center;gap:8px;font-size:10px">
+            <span style="width:6px;height:6px;border-radius:50%;background:#ef4444;flex-shrink:0"></span>
+            <span style="color:#e2e8f0;font-weight:600">exfiltration-correlation</span>
+            <span style="color:#64748b;margin-left:auto">→ Aegis E2 (fleet)</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:10px">
+            <span style="width:6px;height:6px;border-radius:50%;background:#f59e0b;flex-shrink:0"></span>
+            <span style="color:#e2e8f0;font-weight:600">host-network-escape-attempt</span>
+            <span style="color:#64748b;margin-left:auto">→ Cerberus E5 (fleet)</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:10px">
+            <span style="width:6px;height:6px;border-radius:50%;background:#8b5cf6;flex-shrink:0"></span>
+            <span style="color:#e2e8f0;font-weight:600">rootfs-write-attempt</span>
+            <span style="color:#64748b;margin-left:auto">Permanent (session only)</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:10px">
+            <span style="width:6px;height:6px;border-radius:50%;background:#06b6d4;flex-shrink:0"></span>
+            <span style="color:#e2e8f0;font-weight:600">vsock-bypass-attempt</span>
+            <span style="color:#64748b;margin-left:auto">Permanent (session only)</span>
+          </div>
+        </div>
+      </div>
+      <div style="background:rgba(16,185,129,.04);border:1px solid rgba(16,185,129,.2);border-radius:14px;padding:20px">
+        <div style="font-size:11px;font-weight:700;color:#6ee7b7;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px">🟢 Opt-In Rules — Per Session</div>
+        <div style="font-size:11px;color:#94a3b8;line-height:1.7;margin-bottom:12px">Plugins register these at spawn time via <code style="background:rgba(255,255,255,.06);padding:1px 5px;border-radius:3px;font-size:10px">POST /anomalies/configure-session</code>. The plugin declares which protections it wants. Designed for <strong style="color:#e2e8f0">community contribution</strong> — add new behavioral patterns without touching substrate code.</div>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px">
+          <div style="display:flex;align-items:center;gap:8px;font-size:10px">
+            <span style="width:6px;height:6px;border-radius:50%;background:#10b981;flex-shrink:0"></span>
+            <span style="color:#e2e8f0;font-weight:600">prompt-injection-marker</span>
+            <span style="color:#64748b;margin-left:auto">LLM01 coverage</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:10px">
+            <span style="width:6px;height:6px;border-radius:50%;background:#ec4899;flex-shrink:0"></span>
+            <span style="color:#e2e8f0;font-weight:600">tap-leak-attempt</span>
+            <span style="color:#64748b;margin-left:auto">LLM07 coverage</span>
+          </div>
+        </div>
+        <div style="background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.15);border-radius:8px;padding:10px;font-size:10px;color:#6ee7b7">
+          💡 <strong>Community rules in v0.2 wishlist:</strong><br>
+          <span style="color:#94a3b8">memory-scrape-attempt · slow-exfil-drip · credential-echo · model-weight-read</span>
+        </div>
+      </div>
+    </div>
+    <div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:14px 18px;font-size:10px;color:#64748b;display:flex;align-items:center;gap:12px">
+      <span style="font-size:16px">📐</span>
+      <span><strong style="color:#94a3b8">Rule migration path (ADR EMPIRE-475):</strong> Substrate rules that need cross-session context migrate to fleet-level components as they ship (exfil → Aegis E2, network-escape → Cerberus E5). Session layer remains the fast-path enforcer — 200ms budget cannot wait for a fleet round-trip.</span>
+    </div>
+  </div>
+
+  <!-- OPEN SOURCE COMMUNITY -->
+  <div class="section">
+    <div class="section-title">Open Source Community — Build Rules With Us</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px">
+      <div style="background:rgba(99,102,241,.04);border:1px solid rgba(99,102,241,.2);border-radius:12px;padding:16px">
+        <div style="font-size:20px;margin-bottom:8px">🔍</div>
+        <div style="font-size:12px;font-weight:700;color:#a5b4fc;margin-bottom:6px">Write Detection Rules</div>
+        <div style="font-size:10px;color:#64748b;line-height:1.6">New behavioral patterns as YAML or Rust. Map your rule to an OWASP LLM category, document false-positive risk, add a test case. Open a PR.</div>
+      </div>
+      <div style="background:rgba(239,68,68,.04);border:1px solid rgba(239,68,68,.2);border-radius:12px;padding:16px">
+        <div style="font-size:20px;margin-bottom:8px">⚔️</div>
+        <div style="font-size:12px;font-weight:700;color:#fca5a5;margin-bottom:6px">Red Team Scenarios</div>
+        <div style="font-size:10px;color:#64748b;line-height:1.6">Multi-step exfil, vsock side-channels, supply chain via allowlist, rootfs timing attacks. Break it — every slip becomes a permanent probe.</div>
+      </div>
+      <div style="background:rgba(16,185,129,.04);border:1px solid rgba(16,185,129,.2);border-radius:12px;padding:16px">
+        <div style="font-size:20px;margin-bottom:8px">🔧</div>
+        <div style="font-size:12px;font-weight:700;color:#6ee7b7;margin-bottom:6px">Tooling & Integrations</div>
+        <div style="font-size:10px;color:#64748b;line-height:1.6">Fleet parity checks, receipt visualizers, W3C VC export, SIEM integrations. The audit chain is open — build on top of it.</div>
+      </div>
+    </div>
+
+    <div style="background:linear-gradient(135deg,rgba(99,102,241,.08),rgba(236,72,153,.08));border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:24px;display:grid;grid-template-columns:1fr auto;gap:24px;align-items:center">
+      <div>
+        <div style="font-size:14px;font-weight:800;color:#e2e8f0;margin-bottom:8px">New rule proposal format</div>
+        <div style="background:rgba(0,0,0,.3);border-radius:8px;padding:14px;font-family:monospace;font-size:10px;color:#94a3b8;line-height:1.8">
+          <span style="color:#64748b">## Rule: </span><span style="color:#a5b4fc">memory-scrape-attempt</span><br>
+          <span style="color:#64748b">## OWASP: </span><span style="color:#fcd34d">LLM08 · MITRE ATLAS AML.T0025</span><br>
+          <span style="color:#64748b">## Detects: </span><span style="color:#e2e8f0">open(/proc/*/mem) outside own process tree</span><br>
+          <span style="color:#64748b">## FP risk: </span><span style="color:#86efac">LOW</span><span style="color:#64748b"> — no legitimate agent reads arbitrary /proc</span><br>
+          <span style="color:#64748b">## Action: </span><span style="color:#fca5a5">TERMINATE HIGH</span><br>
+          <span style="color:#64748b">## Test: </span><span style="color:#e2e8f0">spawn plugin → open(/proc/1/mem) → expect AnomalyDetected &lt;200ms</span>
+        </div>
+      </div>
+      <div style="text-align:center;min-width:140px">
+        <div style="font-size:28px;margin-bottom:8px">🌍</div>
+        <div style="font-size:11px;font-weight:700;color:#e2e8f0;margin-bottom:4px">Every attack on any<br>customer strengthens<br>every customer's shield</div>
+        <div style="font-size:9px;color:#64748b;margin-top:8px">Captured campaigns become<br>permanent regression probes</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ECOSYSTEM -->
+  <div class="section">
+    <div class="section-title">ArmyKnifeLabs Ecosystem</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+
+      <div style="background:linear-gradient(135deg,rgba(34,197,94,.06),rgba(16,185,129,.03));border:1px solid rgba(34,197,94,.25);border-radius:14px;padding:20px;position:relative;overflow:hidden">
+        <div style="position:absolute;top:-20px;right:-20px;font-size:80px;opacity:.04">🔐</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+          <span style="font-size:22px">🔐</span>
+          <div>
+            <div style="font-size:14px;font-weight:800;color:#e2e8f0">securegit</div>
+            <div style="font-size:9px;color:#22c55e;font-weight:600;letter-spacing:.4px">SECURITY-FIRST GIT + LLM PIPELINE CLI</div>
+          </div>
+        </div>
+        <div style="font-size:10px;color:#94a3b8;line-height:1.7;margin-bottom:12px">
+          Drop-in git replacement with <strong style="color:#e2e8f0">30+ security-first commands</strong>, 12 built-in scanners, and AI-powered commit messages. Orchestrates the full LLM hardening pipeline. <strong style="color:#e2e8f0">60–90% token reduction</strong> in compact mode for LLM agent contexts.
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <div style="font-size:9px;color:#64748b;display:flex;align-items:center;gap:6px"><span style="color:#22c55e">✓</span> 30+ git commands · 12 security scanners</div>
+          <div style="font-size:9px;color:#64748b;display:flex;align-items:center;gap:6px"><span style="color:#22c55e">✓</span> 42-tool MCP server · OAuth GitHub/GitLab</div>
+          <div style="font-size:9px;color:#64748b;display:flex;align-items:center;gap:6px"><span style="color:#22c55e">✓</span> PR gates with security attestation</div>
+          <div style="font-size:9px;color:#64748b;display:flex;align-items:center;gap:6px"><span style="color:#22c55e">✓</span> <code style="font-size:9px;background:rgba(255,255,255,.06);padding:1px 4px;border-radius:3px">cargo install securegit</code></div>
+        </div>
+      </div>
+
+      <div style="background:linear-gradient(135deg,rgba(245,158,11,.06),rgba(234,88,12,.03));border:1px solid rgba(245,158,11,.25);border-radius:14px;padding:20px;position:relative;overflow:hidden">
+        <div style="position:absolute;top:-20px;right:-20px;font-size:80px;opacity:.04">⚔️</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+          <span style="font-size:22px">⚔️</span>
+          <div>
+            <div style="font-size:13px;font-weight:800;color:#e2e8f0">armyknife-llm-hardening</div>
+            <div style="font-size:9px;color:#f59e0b;font-weight:600;letter-spacing:.4px">AUTOMATED LLM HARDENING PIPELINE</div>
+          </div>
+        </div>
+        <div style="font-size:10px;color:#94a3b8;line-height:1.6;margin-bottom:10px">
+          One command. Scan → harden → verify → publish. <strong style="color:#e2e8f0">101 vulnerabilities found in Qwen2.5-7B. 100% fix rate. 0 regressions.</strong> DPO/SFT LoRA fine-tuning via HuggingFace AutoTrain.
+        </div>
+        <div style="background:rgba(245,158,11,.08);border-radius:8px;padding:8px 10px;margin-bottom:10px;font-family:monospace;font-size:9px;color:#fcd34d">
+          securegit hf full-pipeline Qwen/Qwen2.5-7B \<br>
+          &nbsp;&nbsp;--hf-org YourOrg
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <div style="font-size:9px;color:#64748b;display:flex;align-items:center;gap:6px"><span style="color:#f59e0b">✓</span> 80+ probes · 14 OWASP categories</div>
+          <div style="font-size:9px;color:#64748b;display:flex;align-items:center;gap:6px"><span style="color:#f59e0b">✓</span> 6 providers · SARIF 2.1 · CI/CD gates</div>
+          <div style="font-size:9px;color:#64748b;display:flex;align-items:center;gap:6px"><span style="color:#f59e0b">✓</span> MCP scanning · LLM-vs-LLM attacks</div>
+        </div>
+      </div>
+
+      <div style="background:linear-gradient(135deg,rgba(139,92,246,.06),rgba(99,102,241,.03));border:1px solid rgba(139,92,246,.25);border-radius:14px;padding:20px;position:relative;overflow:hidden">
+        <div style="position:absolute;top:-20px;right:-20px;font-size:80px;opacity:.04">🦾</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+          <span style="font-size:22px">🦾</span>
+          <div>
+            <div style="font-size:14px;font-weight:800;color:#e2e8f0">kryptonclaw</div>
+            <div style="font-size:9px;color:#a78bfa;font-weight:600;letter-spacing:.4px">HARDENED AGENT FRAMEWORK</div>
+          </div>
+        </div>
+        <div style="font-size:10px;color:#94a3b8;line-height:1.7;margin-bottom:12px">
+          The agent framework built on top of the AgentOS substrate. Security-first by design — every agent spawns in an attested Firecracker boundary, every action receipted. What agent frameworks <em style="color:#e2e8f0">should</em> have been from the start.
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <div style="font-size:9px;color:#64748b;display:flex;align-items:center;gap:6px"><span style="color:#a78bfa">✓</span> Attested microVM runtime</div>
+          <div style="font-size:9px;color:#64748b;display:flex;align-items:center;gap:6px"><span style="color:#a78bfa">✓</span> AgentShield built-in</div>
+          <div style="font-size:9px;color:#64748b;display:flex;align-items:center;gap:6px"><span style="color:#a78bfa">✓</span> Drop-in for CrewAI / LangGraph</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="footer-logo">ArmyKnifeLabs</div>
+    <div class="footer-tagline">Cryptographic proof that your AI agents did exactly what they were supposed to do.</div>
+<div class="tags">
+      <span class="tag">#AIAgents</span>
+      <span class="tag">#AgentSecurity</span>
+      <span class="tag">#LLMSecurity</span>
+      <span class="tag">#OWASP</span>
+      <span class="tag">#Firecracker</span>
+      <span class="tag">#ZeroTrust</span>
+      <span class="tag">#AgenticAI</span>
+      <span class="tag">#MLSecurity</span>
+      <span class="tag">#AITrustAndSafety</span>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
