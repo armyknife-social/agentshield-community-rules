@@ -1,27 +1,21 @@
-import { receiptdBase } from "../config.js";
+import { receiptdBase, readHeaders, validateSessionId } from "../config.js";
 
 export const queryReceiptsTool = {
   name: "query_receipts",
   description:
     "Query the ContextOS receipt chain via cm-receiptd. " +
     "Returns signed anomaly receipts, session events, and tool calls. " +
-    "Filter by session, receipt kind, or time window.",
+    "Read-only. Requires read token.",
   inputSchema: {
     type: "object" as const,
     properties: {
       session_id: { type: "string", description: "Filter by session ID" },
       kind: {
         type: "string",
-        description: "Filter by receipt kind: AnomalyDetected, SessionStarted, SessionEnded, ToolCall, Custom",
+        description: "Filter by kind: AnomalyDetected, SessionStarted, SessionEnded, ToolCall",
       },
-      since: {
-        type: "string",
-        description: "Time window: '1h', '24h', '7d', or RFC3339 timestamp",
-      },
-      limit: {
-        type: "number",
-        description: "Max receipts to return (default 20)",
-      },
+      since: { type: "string", description: "Time window: '1h', '24h', '7d', or RFC3339" },
+      limit:  { type: "number", description: "Max receipts to return (default 20, max 100)" },
     },
     required: [],
   },
@@ -29,14 +23,11 @@ export const queryReceiptsTool = {
 
 export const getFanoutStatusTool = {
   name: "get_fanout_status",
-  description: "Get cm-receiptd fan-out engine status: active destinations, circuit breaker states, dead-letter queue entries.",
+  description: "Get cm-receiptd fan-out engine status: destinations, circuit breakers, dead-letter queue.",
   inputSchema: {
     type: "object" as const,
     properties: {
-      show_dlq: {
-        type: "boolean",
-        description: "Include dead-letter queue entries (default false)",
-      },
+      show_dlq: { type: "boolean", description: "Include DLQ entries (default false)" },
     },
     required: [],
   },
@@ -48,39 +39,42 @@ export async function handleQueryReceipts(args: {
   since?: string;
   limit?: number;
 }) {
+  if (args.session_id) {
+    const sidErr = validateSessionId(args.session_id);
+    if (sidErr) return { content: [{ type: "text" as const, text: sidErr }], isError: true };
+  }
+
   const params = new URLSearchParams();
   if (args.session_id) params.set("session_id", args.session_id);
   if (args.kind)       params.set("kind", args.kind);
   if (args.since)      params.set("since", args.since);
-  params.set("limit", String(args.limit ?? 20));
+  // Cap at 100 to prevent bulk data extraction
+  params.set("limit", String(Math.min(args.limit ?? 20, 100)));
 
-  const url = `${receiptdBase()}/receipts?${params}`;
   try {
-    const resp = await fetch(url);
-    const data = await resp.json() as Array<Record<string, unknown>>;
+    const resp = await fetch(`${receiptdBase()}/receipts?${params}`, {
+      headers: readHeaders(),
+    });
 
-    if (!data.length) {
-      return { content: [{ type: "text" as const, text: "No receipts found matching filters." }] };
+    if (resp.status === 401) {
+      return { content: [{ type: "text" as const, text: "Unauthorized — AGENTSHIELD_READ_TOKEN required for receipt chain access." }], isError: true };
     }
+
+    const data = await resp.json() as Array<Record<string, unknown>>;
+    if (!data.length) return { content: [{ type: "text" as const, text: "No receipts found." }] };
 
     const lines = data.map(r => {
       const kind = r.kind as string ?? "Unknown";
-      const ts   = r._ingest_ts as string ?? r.timestamp as string ?? "";
+      const ts   = (r._ingest_ts as string ?? "").slice(0, 19);
       const sid  = r.session_id as string ?? "";
       const rid  = (r.receipt_id as string ?? "").slice(0, 24);
-      const rule = r.rule as string ?? r.extra && (r.extra as Record<string,unknown>).rule as string ?? "";
-      const sev  = r.severity as string ?? r.extra && (r.extra as Record<string,unknown>).severity as string ?? "";
+      const rule = r.rule as string ?? (r.extra as Record<string, unknown>)?.rule as string ?? "";
+      const sev  = r.severity as string ?? (r.extra as Record<string, unknown>)?.severity as string ?? "";
       const term = r.terminated !== undefined ? ` terminated:${r.terminated}` : "";
-
-      return `[${ts.slice(0, 19)}] ${kind}${rule ? ` rule:${rule}` : ""}${sev ? ` sev:${sev}` : ""}${term} session:${sid.slice(0, 20)} id:${rid}`;
+      return `[${ts}] ${kind}${rule ? ` rule:${rule}` : ""}${sev ? ` sev:${sev}` : ""}${term} session:${sid.slice(0, 20)} id:${rid}`;
     });
 
-    return {
-      content: [{
-        type: "text" as const,
-        text: `${data.length} receipt(s):\n\n${lines.join("\n")}`,
-      }],
-    };
+    return { content: [{ type: "text" as const, text: `${data.length} receipt(s):\n\n${lines.join("\n")}` }] };
   } catch (err) {
     return { content: [{ type: "text" as const, text: `cm-receiptd not reachable: ${err}` }], isError: true };
   }
@@ -88,9 +82,8 @@ export async function handleQueryReceipts(args: {
 
 export async function handleGetFanoutStatus(args: { show_dlq?: boolean }) {
   try {
-    const statusResp = await fetch(`${receiptdBase()}/fanout/status`);
-    const status = await statusResp.json() as Record<string, unknown>;
-
+    const resp = await fetch(`${receiptdBase()}/fanout/status`, { headers: readHeaders() });
+    const status = await resp.json() as Record<string, unknown>;
     const lines: string[] = [];
 
     if (status.fanout === "disabled") {
@@ -109,16 +102,12 @@ export async function handleGetFanoutStatus(args: { show_dlq?: boolean }) {
     }
 
     if (args.show_dlq) {
-      const dlqResp = await fetch(`${receiptdBase()}/fanout/dlq?limit=10`);
+      const dlqResp = await fetch(`${receiptdBase()}/fanout/dlq?limit=10`, { headers: readHeaders() });
       const dlq = await dlqResp.json() as Array<Record<string, unknown>>;
-      if (dlq.length > 0) {
-        lines.push(`\nDead-letter queue (${dlq.length} entries):`);
-        dlq.forEach(e => {
-          lines.push(`  [${e.dlq_at as string}] ${e.dest_id} — ${e.error} (${e.attempts} attempts)`);
-        });
-      } else {
-        lines.push("\nDead-letter queue: empty");
-      }
+      lines.push(dlq.length > 0
+        ? `\nDLQ (${dlq.length} entries):\n${dlq.map(e => `  [${e.dlq_at}] ${e.dest_id} — ${e.error} (${e.attempts} attempts)`).join("\n")}`
+        : "\nDLQ: empty"
+      );
     }
 
     return { content: [{ type: "text" as const, text: lines.join("\n") }] };

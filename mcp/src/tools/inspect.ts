@@ -1,12 +1,11 @@
-import { aegisBase, authHeaders } from "../config.js";
+import { aegisBase, readHeaders, checkInspectRateLimit } from "../config.js";
 
 export const inspectContentTool = {
   name: "inspect_content",
   description:
     "Inspect content through Aegis inline detector. Returns verdict (allow/warn/mirror/block), " +
     "confidence score, matched rule IDs, and elapsed_ms. " +
-    "Use content_type='user_input' for incoming requests, 'retrieval' for RAG/tool output, " +
-    "'response' for model output before sending to the user.",
+    "Rate-limited to prevent pattern-probing attacks.",
   inputSchema: {
     type: "object" as const,
     properties: {
@@ -21,7 +20,7 @@ export const inspectContentTool = {
       },
       session_id: {
         type: "string",
-        description: "Session identifier (optional — used for logging)",
+        description: "Session identifier (optional — used for logging and rate limiting)",
       },
     },
     required: ["content", "content_type"],
@@ -33,12 +32,21 @@ export async function handleInspectContent(args: {
   content_type: string;
   session_id?: string;
 }) {
+  // Rate limit per session to prevent Aegis pattern-probing
+  const rateErr = checkInspectRateLimit(args.session_id ?? "");
+  if (rateErr) {
+    return {
+      content: [{ type: "text" as const, text: rateErr }],
+      isError: true,
+    };
+  }
+
   const url = `${aegisBase()}/inspect`;
   let resp: Response;
   try {
     resp = await fetch(url, {
       method: "POST",
-      headers: authHeaders(),
+      headers: readHeaders(),
       body: JSON.stringify({
         content: args.content,
         content_type: args.content_type,
@@ -49,19 +57,20 @@ export async function handleInspectContent(args: {
     return {
       content: [{
         type: "text" as const,
-        text: `Aegis not reachable at ${aegisBase()} — is cm-aegisd running? Error: ${err}`,
+        text: `Aegis not reachable at ${aegisBase()} — is cm-aegisd running on the same host?\n` +
+              `Note: cm-aegisd binds 127.0.0.1 by design. MCP server must run on the same host.\n` +
+              `Error: ${err}`,
       }],
       isError: true,
     };
   }
 
   const data = await resp.json() as Record<string, unknown>;
-
-  const verdict = data.verdict as string;
+  const verdict    = data.verdict as string;
   const confidence = data.confidence as number;
-  const matched = (data.matched_rules as string[]) ?? [];
-  const elapsed = data.elapsed_ms as number;
-  const shadow = data.shadow as boolean;
+  const matched    = (data.matched_rules as string[]) ?? [];
+  const elapsed    = data.elapsed_ms as number;
+  const shadow     = data.shadow as boolean;
 
   const verdictLine =
     verdict === "block"  ? `BLOCK (confidence ${(confidence * 100).toFixed(0)}%)` :
@@ -72,17 +81,15 @@ export async function handleInspectContent(args: {
   const lines = [
     `Verdict: ${verdictLine}`,
     `Elapsed: ${elapsed}ms`,
-    shadow ? `Mode: SHADOW (enforcement disabled — real verdict logged only)` : `Mode: ENFORCING`,
+    shadow ? `Mode: SHADOW (enforcement disabled)` : `Mode: ENFORCING`,
     matched.length > 0
       ? `Matched rules:\n${matched.map(r => `  - ${r}`).join("\n")}`
       : `Matched rules: none`,
   ];
 
-  if (data.signals && Array.isArray(data.signals) && data.signals.length > 0) {
+  if (data.signals && Array.isArray(data.signals) && (data.signals as string[]).length > 0) {
     lines.push(`Signals:\n${(data.signals as string[]).map(s => `  ${s}`).join("\n")}`);
   }
 
-  return {
-    content: [{ type: "text" as const, text: lines.join("\n") }],
-  };
+  return { content: [{ type: "text" as const, text: lines.join("\n") }] };
 }

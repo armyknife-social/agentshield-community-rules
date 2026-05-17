@@ -1,25 +1,21 @@
-import { agentshieldBase, authHeaders } from "../config.js";
+import { agentshieldBase, writeHeaders, readHeaders, validateSessionId } from "../config.js";
 
 export const configureSessionTool = {
   name: "configure_session",
   description:
-    "Register opt-in AgentShield rules for a session. Rules in this list will fire " +
-    "for this session when detected by Aegis. Substrate rules (exfiltration-correlation etc.) " +
-    "are always-on and do not need to be registered.",
+    "Register opt-in AgentShield rules for a session. Requires write token. " +
+    "Substrate rules are always-on and do not need registration.",
   inputSchema: {
     type: "object" as const,
     properties: {
-      session_id: { type: "string", description: "Session identifier" },
-      plugin_id:  { type: "string", description: "Plugin or agent identifier" },
+      session_id: { type: "string" },
+      plugin_id:  { type: "string" },
       rules: {
         type: "array",
         items: { type: "string" },
-        description: "Rule IDs to register (must be in KNOWN_OPT_IN_RULES)",
+        description: "Rule IDs to register",
       },
-      expires_at: {
-        type: "string",
-        description: "Optional RFC3339 expiry. Defaults to now + 1 hour.",
-      },
+      expires_at: { type: "string", description: "Optional RFC3339 expiry" },
     },
     required: ["session_id", "plugin_id", "rules"],
   },
@@ -27,11 +23,11 @@ export const configureSessionTool = {
 
 export const deconfigureSessionTool = {
   name: "deconfigure_session",
-  description: "Remove all opt-in rule registrations for a session. Called at session end.",
+  description: "Remove opt-in rule registrations for a session. Requires write token.",
   inputSchema: {
     type: "object" as const,
     properties: {
-      session_id: { type: "string", description: "Session identifier to clear" },
+      session_id: { type: "string" },
     },
     required: ["session_id"],
   },
@@ -39,7 +35,7 @@ export const deconfigureSessionTool = {
 
 export const getSessionsTool = {
   name: "get_sessions",
-  description: "List all active session rule configurations (registered sessions + their opt-in rules).",
+  description: "List all active session rule configurations. Read-only.",
   inputSchema: { type: "object" as const, properties: {}, required: [] },
 };
 
@@ -49,7 +45,9 @@ export async function handleConfigureSession(args: {
   rules: string[];
   expires_at?: string;
 }) {
-  const url = `${agentshieldBase()}/anomalies/configure-session`;
+  const sidErr = validateSessionId(args.session_id);
+  if (sidErr) return { content: [{ type: "text" as const, text: sidErr }], isError: true };
+
   const body: Record<string, unknown> = {
     session_id: args.session_id,
     plugin_id:  args.plugin_id,
@@ -58,23 +56,25 @@ export async function handleConfigureSession(args: {
   if (args.expires_at) body.expires_at = args.expires_at;
 
   try {
-    const resp = await fetch(url, {
+    const resp = await fetch(`${agentshieldBase()}/anomalies/configure-session`, {
       method: "POST",
-      headers: authHeaders(),
+      headers: writeHeaders(),
       body: JSON.stringify(body),
     });
+
+    if (resp.status === 401) {
+      return { content: [{ type: "text" as const, text: "Unauthorized — AGENTSHIELD_WRITE_TOKEN invalid or missing." }], isError: true };
+    }
+
     const data = await resp.json() as Record<string, unknown>;
     const accepted = (data.accepted_rules as string[]) ?? [];
     const rejected = (data.rejected_rules as string[]) ?? [];
-    const expires  = data.expires_at as string;
-
     const lines = [
       `Session ${args.session_id} configured.`,
       `Accepted rules (${accepted.length}): ${accepted.join(", ") || "none"}`,
-      rejected.length > 0 ? `Rejected rules (unknown IDs): ${rejected.join(", ")}` : null,
-      `Expires: ${expires}`,
-    ].filter(Boolean);
-
+      ...(rejected.length > 0 ? [`Rejected (unknown IDs): ${rejected.join(", ")}`] : []),
+      `Expires: ${data.expires_at}`,
+    ];
     return { content: [{ type: "text" as const, text: lines.join("\n") }] };
   } catch (err) {
     return { content: [{ type: "text" as const, text: `Error: ${err}` }], isError: true };
@@ -82,29 +82,36 @@ export async function handleConfigureSession(args: {
 }
 
 export async function handleDeconfigureSession(args: { session_id: string }) {
-  const url = `${agentshieldBase()}/anomalies/configure-session/${encodeURIComponent(args.session_id)}`;
+  const sidErr = validateSessionId(args.session_id);
+  if (sidErr) return { content: [{ type: "text" as const, text: sidErr }], isError: true };
+
   try {
-    const resp = await fetch(url, { method: "DELETE", headers: authHeaders() });
-    if (resp.status === 404) {
-      return { content: [{ type: "text" as const, text: `Session ${args.session_id} not found (may have already expired).` }] };
+    const resp = await fetch(
+      `${agentshieldBase()}/anomalies/configure-session/${encodeURIComponent(args.session_id)}`,
+      { method: "DELETE", headers: writeHeaders() }
+    );
+    if (resp.status === 401) {
+      return { content: [{ type: "text" as const, text: "Unauthorized — AGENTSHIELD_WRITE_TOKEN required." }], isError: true };
     }
-    return { content: [{ type: "text" as const, text: `Session ${args.session_id} deconfigured. Rules cleared.` }] };
+    if (resp.status === 404) {
+      return { content: [{ type: "text" as const, text: `Session ${args.session_id} not found (already expired?).` }] };
+    }
+    return { content: [{ type: "text" as const, text: `Session ${args.session_id} deconfigured.` }] };
   } catch (err) {
     return { content: [{ type: "text" as const, text: `Error: ${err}` }], isError: true };
   }
 }
 
 export async function handleGetSessions() {
-  const url = `${agentshieldBase()}/anomalies/sessions`;
   try {
-    const resp = await fetch(url, { headers: authHeaders() });
+    const resp = await fetch(`${agentshieldBase()}/anomalies/sessions`, { headers: readHeaders() });
     const data = await resp.json() as Array<Record<string, unknown>>;
     if (!data.length) return { content: [{ type: "text" as const, text: "No active session configurations." }] };
 
     const lines = data.map(s =>
       `${s.session_id} (plugin: ${s.plugin_id})\n  rules: ${(s.rules as string[]).join(", ")}\n  expires: ${s.expires_at}`
     );
-    return { content: [{ type: "text" as const, text: `${data.length} active sessions:\n\n${lines.join("\n\n")}` }] };
+    return { content: [{ type: "text" as const, text: `${data.length} active session(s):\n\n${lines.join("\n\n")}` }] };
   } catch (err) {
     return { content: [{ type: "text" as const, text: `Error: ${err}` }], isError: true };
   }
