@@ -2,7 +2,7 @@
 
 Detection rules for AI agent security. Schema-validated, MIT licensed, community maintained.
 
-**[armyknifelabs.github.io/agentshield-community-rules](https://armyknifelabs.github.io/agentshield-community-rules)** &mdash; platform overview, architecture diagram, rule browser, compliance profiles.
+**[armyknife-social.github.io/agentshield-community-rules](https://armyknife-social.github.io/agentshield-community-rules)** &mdash; platform overview, architecture diagram, rule browser, compliance profiles.
 
 ---
 
@@ -373,7 +373,7 @@ Rules in `rules/experimental/` are community-contributed and carry their own aut
 
 ## Links
 
-- [armyknifelabs.github.io/agentshield-community-rules](https://armyknifelabs.github.io/agentshield-community-rules) — platform overview and architecture
+- [armyknife-social.github.io/agentshield-community-rules](https://armyknife-social.github.io/agentshield-community-rules) — platform overview and architecture
 - [AgentShield](https://contextos.armyknifelabs.com/#agentshield)
 - [OWASP LLM Top 10](https://owasp.org/www-project-top-10-for-large-language-model-applications/)
 - [rule-schema.md](rule-schema.md) — full schema reference
