@@ -11,24 +11,27 @@
 #   7. Summary: PASS/FAIL per category
 #
 # Usage:
-#   CM_AGENTSHIELD_CONTROL_TOKEN=<token> ./scripts/smoke-test.sh
-#   CM_AGENTSHIELD_CONTROL_TOKEN=<token> VM=192.168.2.117 ./scripts/smoke-test.sh
+#   CM_AGENTSHIELD_CONTROL_TOKEN=<token> VM=<your-vm-ip> ./scripts/smoke-test.sh
 #
-# Env:
-#   VM                    IP of fcc VM to test (default: 192.168.2.116 = fcc-primary)
+# Env (all required — no defaults for IPs):
+#   VM                    IP of your AgentShield VM (cm-agentshieldd host)
 #   AGENTSHIELD_PORT      cm-agentshieldd port (default: 7160)
 #   AEGIS_PORT            cm-aegisd port (default: 7170)
-#   RECEIPTD_HOST         cm-receiptd host (default: 192.168.2.114:8445)
+#   RECEIPTD_HOST         cm-receiptd host:port (default: <VM>:8445)
 #   CM_AGENTSHIELD_CONTROL_TOKEN  bearer token for control endpoints
 #   SESSION_ID            test session ID (default: smoke-test-$(date +%s))
 #   PLUGIN_ID             test plugin ID (default: smoke-test-plugin)
 
 set -euo pipefail
 
-VM="${VM:-192.168.2.116}"
+if [[ -z "${VM:-}" ]]; then
+    echo "ERROR: VM env var required. Example: VM=10.0.0.5 ./scripts/smoke-test.sh"
+    exit 1
+fi
+
 AGENTSHIELD_PORT="${AGENTSHIELD_PORT:-7160}"
 AEGIS_PORT="${AEGIS_PORT:-7170}"
-RECEIPTD_HOST="${RECEIPTD_HOST:-192.168.2.114:8445}"
+RECEIPTD_HOST="${RECEIPTD_HOST:-${VM}:8445}"
 SESSION_ID="${SESSION_ID:-smoke-test-$(date +%s)}"
 PLUGIN_ID="${PLUGIN_ID:-smoke-test-plugin}"
 TOKEN="${CM_AGENTSHIELD_CONTROL_TOKEN:-}"
