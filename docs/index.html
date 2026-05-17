@@ -415,7 +415,8 @@
     <li><a href="#rules">Rules</a></li>
     <li><a href="#owasp">OWASP</a></li>
     <li><a href="#profiles">Profiles</a></li>
-    <li><a href="https://github.com/armyknifelabs/agentshield-community-rules" class="nav-cta">View on GitHub</a></li>
+    <li><a href="#mcp">MCP</a></li>
+    <li><a href="https://github.com/armyknife-social/agentshield-community-rules" class="nav-cta">View on GitHub</a></li>
   </ul>
 </nav>
 
@@ -662,6 +663,69 @@
 <span class="cm"># substrate rules always-on regardless of profile:</span>
 <span class="cm"># exfiltration-correlation, host-network-escape-attempt,</span>
 <span class="cm"># rootfs-write-attempt, vsock-bypass-attempt</span></pre>
+  </div>
+</div>
+
+<!-- MCP Server -->
+<div class="section" id="mcp">
+  <div class="section-header">
+    <div class="section-label">MCP Server</div>
+    <h2>Claude can run AgentShield directly</h2>
+    <p class="section-desc">
+      An MCP (Model Context Protocol) server ships in <code style="font-family:var(--mono);font-size:13px;color:var(--accent)">mcp/</code>.
+      Gives Claude and any MCP client direct access to the AgentShield substrate &mdash;
+      inspect content, manage sessions, query anomalies, read the receipt chain, browse rules.
+    </p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;">
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px;">
+      <div style="font-size:11px;font-weight:600;color:var(--accent);letter-spacing:.6px;text-transform:uppercase;margin-bottom:12px">12 Tools</div>
+      <div style="font-family:var(--mono);font-size:12px;color:var(--muted);line-height:2;">
+        inspect_content<br>
+        trigger_rule<br>
+        configure_session<br>
+        get_anomalies<br>
+        query_receipts<br>
+        list_rules &middot; get_rule<br>
+        validate_rule<br>
+        get_agentshield_status
+      </div>
+    </div>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px;">
+      <div style="font-size:11px;font-weight:600;color:var(--accent);letter-spacing:.6px;text-transform:uppercase;margin-bottom:12px">3 Prompts</div>
+      <div style="font-family:var(--mono);font-size:12px;color:var(--muted);line-height:2;">
+        write_rule<br>
+        investigate_anomaly<br>
+        compliance_check
+      </div>
+      <div style="font-size:11px;font-weight:600;color:var(--accent);letter-spacing:.6px;text-transform:uppercase;margin-bottom:12px;margin-top:16px">3 Resources</div>
+      <div style="font-family:var(--mono);font-size:12px;color:var(--muted);line-height:2;">
+        agentshield://rules<br>
+        agentshield://profiles<br>
+        agentshield://schema
+      </div>
+    </div>
+  </div>
+
+  <pre style="background:#0a1025;border:1px solid var(--border);border-radius:10px;padding:20px 24px;font-family:var(--mono);font-size:12px;line-height:1.7;overflow-x:auto;color:#e2e8f0;"><span style="color:#475569">// claude_desktop_config.json</span>
+{
+  <span style="color:#a5b4fc">"mcpServers"</span>: {
+    <span style="color:#a5b4fc">"agentshield"</span>: {
+      <span style="color:#a5b4fc">"command"</span>: <span style="color:#86efac">"node"</span>,
+      <span style="color:#a5b4fc">"args"</span>: [<span style="color:#86efac">"/path/to/agentshield-community-rules/mcp/dist/index.js"</span>],
+      <span style="color:#a5b4fc">"env"</span>: {
+        <span style="color:#a5b4fc">"AGENTSHIELD_HOST"</span>:              <span style="color:#86efac">"127.0.0.1"</span>,
+        <span style="color:#a5b4fc">"CM_AGENTSHIELD_CONTROL_TOKEN"</span>: <span style="color:#86efac">"&lt;your-token&gt;"</span>,
+        <span style="color:#a5b4fc">"AGENTSHIELD_RULES_DIR"</span>:         <span style="color:#86efac">"/path/to/agentshield-community-rules"</span>
+      }
+    }
+  }
+}</pre>
+
+  <div style="margin-top:16px;display:flex;gap:12px;">
+    <a href="https://github.com/armyknife-social/agentshield-community-rules/tree/main/mcp" class="btn btn-secondary" style="font-size:13px;padding:10px 20px;">View mcp/ source</a>
+    <a href="https://github.com/armyknife-social/agentshield-community-rules/blob/main/mcp/README.md" class="btn btn-secondary" style="font-size:13px;padding:10px 20px;">MCP README</a>
   </div>
 </div>
 

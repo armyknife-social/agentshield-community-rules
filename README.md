@@ -363,6 +363,34 @@ This is the differentiator. A CVE scanner can tell you what vulnerabilities exis
 
 ---
 
+## MCP Server
+
+An [MCP (Model Context Protocol)](https://modelcontextprotocol.io) server ships in `mcp/`. It gives Claude and other MCP clients direct access to the AgentShield substrate.
+
+```json
+{
+  "mcpServers": {
+    "agentshield": {
+      "command": "node",
+      "args": ["/path/to/agentshield-community-rules/mcp/dist/index.js"],
+      "env": {
+        "AGENTSHIELD_HOST": "127.0.0.1",
+        "CM_AGENTSHIELD_CONTROL_TOKEN": "<token>",
+        "AGENTSHIELD_RULES_DIR": "/path/to/agentshield-community-rules"
+      }
+    }
+  }
+}
+```
+
+Tools: `inspect_content`, `trigger_rule`, `configure_session`, `get_anomalies`, `query_receipts`, `list_rules`, `validate_rule`, and more. See [mcp/README.md](mcp/README.md).
+
+```bash
+cd mcp && npm install && npm run build
+```
+
+---
+
 ## License
 
 MIT. See [LICENSE](LICENSE).
