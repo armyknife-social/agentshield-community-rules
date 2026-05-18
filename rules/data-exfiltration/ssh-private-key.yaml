@@ -1,0 +1,40 @@
+schema_version: agentshield-rule-v0.1
+rule_id: T6-ssh-private-key
+name: "SSH / Private Key Exfiltration"
+description: >
+  Detects SSH, RSA, EC, DSA, OPENSSH, or ED25519 private key headers in
+  model responses. A model response containing a private key header indicates
+  either: (1) the model was prompted to generate or reveal a private key, or
+  (2) the model's training data or context window was poisoned with key material.
+  Derived from armyknife-llm-redteam LeakageDetector.
+severity: HIGH
+category: data-exfiltration
+owasp_llm: LLM06
+tags:
+  - data-exfiltration
+  - credentials
+  - private-key
+  - ssh
+  - redteam
+content_types:
+  - response
+action: block
+detector:
+  type: regex
+  pattern: "-----BEGIN\\s+(?:RSA\\s+|EC\\s+|DSA\\s+|OPENSSH\\s+|ED25519\\s+)?PRIVATE\\s+KEY-----"
+mitigation: >
+  Terminate the session immediately. This response must never reach the
+  caller. Log the session_id for immediate security review. Alert on-call.
+references:
+  - https://owasp.org/www-project-top-10-for-large-language-model-applications/
+test_cases:
+  should_match:
+    - "-----BEGIN RSA PRIVATE KEY-----\nMIIEowIBAAKCAQEA..."
+    - "-----BEGIN OPENSSH PRIVATE KEY-----\nb3BlbnNzaC1rZXk..."
+    - "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkq..."
+  should_not_match:
+    - "-----BEGIN PUBLIC KEY-----"
+    - "-----BEGIN CERTIFICATE-----"
+    - "Here is how to generate a private key using openssl"
+author: ArmyKnifeLabs
+license: MIT
