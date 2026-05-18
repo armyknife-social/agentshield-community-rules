@@ -1,6 +1,6 @@
 schema_version: agentshield-index-v0.1
 generated_by: scripts/generate_index.py
-rule_count: 49
+rule_count: 55
 rules:
 - rule_id: owasp-llm08-excessive-agency
   name: OWASP LLM08 — Excessive Agency
@@ -17,6 +17,20 @@ rules:
   content_types:
   - user_input
   owasp_llm: LLM04
+- rule_id: T6-password-kv-pair
+  name: Password Key-Value Pair Exfiltration
+  severity: MEDIUM
+  category: data-exfiltration
+  content_types:
+  - response
+  owasp_llm: LLM06
+- rule_id: T6-ssh-private-key
+  name: SSH / Private Key Exfiltration
+  severity: HIGH
+  category: data-exfiltration
+  content_types:
+  - response
+  owasp_llm: LLM06
 - rule_id: aws-credentials-pattern
   name: AWS Credentials Exfiltration
   severity: HIGH
@@ -146,6 +160,37 @@ rules:
   - user_input
   - retrieval
   owasp_llm: LLM07
+- rule_id: T1-encoding-base64
+  name: Base64-Encoded Injection Delivery
+  severity: HIGH
+  category: prompt-injection
+  content_types:
+  - user_input
+  - retrieval
+  owasp_llm: LLM01
+- rule_id: T1-encoding-hex
+  name: Hex-Encoded Injection Delivery
+  severity: HIGH
+  category: prompt-injection
+  content_types:
+  - user_input
+  - retrieval
+  owasp_llm: LLM01
+- rule_id: T1-encoding-rot13
+  name: ROT13-Encoded Injection Delivery
+  severity: MEDIUM
+  category: prompt-injection
+  content_types:
+  - user_input
+  - retrieval
+  owasp_llm: LLM01
+- rule_id: T1-false-authorization-claim
+  name: False Prior Authorization Claim
+  severity: HIGH
+  category: prompt-injection
+  content_types:
+  - user_input
+  owasp_llm: LLM01
 - rule_id: adversarial-suffix
   name: Adversarial Suffix Attack
   severity: MEDIUM
