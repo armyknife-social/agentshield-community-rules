@@ -330,6 +330,8 @@ LOW    → warn   (0.50)             logged only
 
 When cm-aegisd returns `block`, Cerberus fires `POST /trigger` to cm-agentshieldd. For substrate rules, the ATCS enforcement policy terminates the session unconditionally regardless of severity. For opt-in rules, HIGH-severity triggers a session kill; MEDIUM and LOW are logged only.
 
+**Signal redaction:** Rules in the `data-exfiltration` category (`T6-*`, `phi-exfil-pattern`, `pci-pattern-detector`, `pii-bulk-detection`) never include the matched text in the `signals` field of the `/inspect` response. Instead of the matched snippet, you will see `[rule_id] <redacted>`. This prevents the detection mechanism from re-disclosing the secret or PII it detected to downstream consumers. The `matched_rules` array still identifies which rules fired.
+
 ---
 
 ## Enterprise integration
@@ -358,6 +360,14 @@ destinations:
 ```
 
 Every receipt carries per-tool-call attribution with a cryptographic chain of custody anchored to the operator's YubiKey. The `AnomalyDetected` receipt includes `rule`, `severity`, `session_id`, `elapsed_ms`, and `terminated` at the top level — fields that land directly in Splunk's index without requiring field extraction.
+
+**Fan-out management endpoints** (`GET /fanout/status`, `GET /fanout/dlq`) require a bearer token:
+
+```bash
+export CM_RECEIPTD_FANOUT_TOKEN=<strong-random-token>   # required — endpoints locked if unset
+```
+
+The fanout delivery destinations (Splunk, PagerDuty, etc.) are configured in the YAML above and require no additional authentication on the cm-receiptd side beyond your destination credentials.
 
 This is the differentiator. A CVE scanner can tell you what vulnerabilities exist on a host. AgentShield tells you which tool call by which agent identity triggered which anomaly rule at which point in a session, with a receipt signed by the operator's hardware key and linked into an immutable chain.
 
@@ -407,3 +417,4 @@ Rules in `rules/experimental/` are community-contributed and carry their own aut
 - [rule-schema.md](rule-schema.md) — full schema reference
 - [OWASP-MAPPING.md](OWASP-MAPPING.md) — complete OWASP coverage map
 - [CONTRIBUTING.md](CONTRIBUTING.md) — contribution guidelines
+
