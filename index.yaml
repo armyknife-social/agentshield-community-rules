@@ -1,6 +1,6 @@
 schema_version: agentshield-index-v0.1
 generated_by: scripts/generate_index.py
-rule_count: 55
+rule_count: 58
 rules:
 - rule_id: owasp-llm08-excessive-agency
   name: OWASP LLM08 — Excessive Agency
@@ -17,6 +17,13 @@ rules:
   content_types:
   - user_input
   owasp_llm: LLM04
+- rule_id: T6-github-extended-token
+  name: GitHub OAuth / Fine-Grained PAT / GitLab Deploy Token Exfiltration
+  severity: HIGH
+  category: data-exfiltration
+  content_types:
+  - response
+  owasp_llm: LLM06
 - rule_id: T6-password-kv-pair
   name: Password Key-Value Pair Exfiltration
   severity: MEDIUM
@@ -190,6 +197,22 @@ rules:
   category: prompt-injection
   content_types:
   - user_input
+  owasp_llm: LLM01
+- rule_id: T2-bidi-override
+  name: Trojan Source BiDi Override Injection
+  severity: HIGH
+  category: prompt-injection
+  content_types:
+  - user_input
+  - retrieval
+  owasp_llm: LLM02
+- rule_id: T2-homoglyph-injection
+  name: Cyrillic / Greek / Armenian Homoglyph Keyword Evasion
+  severity: MEDIUM
+  category: prompt-injection
+  content_types:
+  - user_input
+  - retrieval
   owasp_llm: LLM01
 - rule_id: adversarial-suffix
   name: Adversarial Suffix Attack
