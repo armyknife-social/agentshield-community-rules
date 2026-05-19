@@ -1,0 +1,48 @@
+schema_version: agentshield-rule-v0.1
+rule_id: T2-bidi-override
+name: "Trojan Source BiDi Override Injection"
+description: >
+  Detects Unicode bidirectional control characters used to hide or reverse
+  adversarial instructions inside text that appears harmless when rendered.
+  Trojan Source (CVE-2021-42574) applied to LLM prompt injection: BiDi
+  overrides cause the visual rendering of content to differ from its logical
+  order, hiding injection payloads in code comments, documentation, or
+  retrieval content.
+  Covers: RLO (U+202E), LRO (U+202D), RLE (U+202B), LRE (U+202A),
+  PDF (U+202C), RLI (U+2067), LRI (U+2066), FSI (U+2068), PDI (U+2069),
+  RTL Mark (U+200F), LTR Mark (U+200E).
+  Source: securegit-v2 EncodingScanner Trojan Source detection.
+severity: HIGH
+category: prompt-injection
+owasp_llm: LLM02
+tags:
+  - prompt-injection
+  - trojan-source
+  - unicode-evasion
+  - bidi
+  - CVE-2021-42574
+  - securegit
+content_types:
+  - user_input
+  - retrieval
+action: block
+detector:
+  type: regex
+  pattern: "(?u)(\u202e|\u202d|\u202b|\u202a|\u202c|\u2067|\u2066|\u2068|\u2069|\u200f|\u200e)"
+mitigation: >
+  Block immediately. The presence of BiDi override characters in a user message
+  or retrieved document is almost never legitimate and indicates an attempt to
+  hide content from visual inspection. Strip and log the raw bytes.
+references:
+  - https://owasp.org/www-project-top-10-for-large-language-model-applications/
+  - https://trojansource.codes/
+  - https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2021-42574
+test_cases:
+  should_match:
+    - "Normal text\u202enoitcejni neddih"
+    - "Comment: // expected\u202d injected payload"
+  should_not_match:
+    - "This text has no special unicode characters"
+    - "Regular arabic text without override marks"
+author: ArmyKnifeLabs
+license: MIT
