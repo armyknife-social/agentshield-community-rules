@@ -1,0 +1,43 @@
+schema_version: agentshield-rule-v0.1
+rule_id: T6-github-extended-token
+name: "GitHub OAuth / Fine-Grained PAT / GitLab Deploy Token Exfiltration"
+description: >
+  Detects GitHub OAuth access tokens (gho_), GitHub user-to-server tokens (ghu_),
+  GitHub server-to-server tokens (ghs_), GitHub fine-grained PATs (github_pat_),
+  and GitLab deploy tokens (gldt-) in model responses.
+  These formats are absent from the baseline T6-secret-key-prefix rule which only
+  covers classic ghp_ PATs. Source: securegit-v2 MCP sanitizer credential pattern
+  corpus (src/mcp/sanitizer.rs).
+severity: HIGH
+category: data-exfiltration
+owasp_llm: LLM06
+tags:
+  - data-exfiltration
+  - credentials
+  - github
+  - gitlab
+  - oauth-token
+  - securegit
+content_types:
+  - response
+action: block
+detector:
+  type: regex
+  pattern: "(?-i)(gho_[A-Za-z0-9]{36,}|ghu_[A-Za-z0-9]{36,}|ghs_[A-Za-z0-9]{36,}|github_pat_[A-Za-z0-9_]{22,}|gldt-[A-Za-z0-9\\-_.]{20,})"
+mitigation: >
+  Terminate the session immediately. These tokens grant repository access.
+  Log the session_id for security review. Notify the token owner to rotate.
+references:
+  - https://owasp.org/www-project-top-10-for-large-language-model-applications/
+  - https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/about-authentication-to-github
+test_cases:
+  should_match:
+    - "Here is your token: gho_16C7e42F292c6912E7710c838347Ae178B4a"
+    - "OAuth token: ghu_16C7e42F292c6912E7710c838347Ae178B4a"
+    - "github_pat_11AAAAAA0xxxxxxxxxxxxx_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    - "gldt-xxxxxxxxxxxxxxxxxxxx-xxxx"
+  should_not_match:
+    - "GitHub Actions uses GITHUB_TOKEN automatically"
+    - "Set the GHO_ prefix for your custom variable"
+author: ArmyKnifeLabs
+license: MIT
