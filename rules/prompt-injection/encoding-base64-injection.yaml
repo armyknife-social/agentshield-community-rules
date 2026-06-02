@@ -1,5 +1,5 @@
 schema_version: agentshield-rule-v0.1
-rule_id: T1-encoding-base64
+rule_id: encoding-base64-injection
 name: "Base64-Encoded Injection Delivery"
 description: >
   Detects prompt injection payloads wrapped in Base64 encoding with a decode

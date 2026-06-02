@@ -1,5 +1,5 @@
 schema_version: agentshield-rule-v0.1
-rule_id: T1-encoding-rot13
+rule_id: encoding-rot13-injection
 name: "ROT13-Encoded Injection Delivery"
 description: >
   Detects ROT13-encoded injection delivery. Lower severity than base64/hex

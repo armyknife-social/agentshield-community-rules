@@ -1,5 +1,5 @@
 schema_version: agentshield-rule-v0.1
-rule_id: T6-ssh-private-key
+rule_id: ssh-private-key
 name: "SSH / Private Key Exfiltration"
 description: >
   Detects SSH, RSA, EC, DSA, OPENSSH, or ED25519 private key headers in

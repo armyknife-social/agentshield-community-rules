@@ -1,5 +1,5 @@
 schema_version: agentshield-rule-v0.1
-rule_id: T2-homoglyph-injection
+rule_id: homoglyph-injection
 name: "Cyrillic / Greek / Armenian Homoglyph Keyword Evasion"
 description: >
   Detects Cyrillic, Greek, and Armenian characters used as visual substitutes

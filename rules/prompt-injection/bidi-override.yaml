@@ -1,5 +1,5 @@
 schema_version: agentshield-rule-v0.1
-rule_id: T2-bidi-override
+rule_id: bidi-override
 name: "Trojan Source BiDi Override Injection"
 description: >
   Detects Unicode bidirectional control characters used to hide or reverse

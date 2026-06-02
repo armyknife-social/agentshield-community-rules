@@ -17,27 +17,6 @@ rules:
   content_types:
   - user_input
   owasp_llm: LLM04
-- rule_id: T6-github-extended-token
-  name: GitHub OAuth / Fine-Grained PAT / GitLab Deploy Token Exfiltration
-  severity: HIGH
-  category: data-exfiltration
-  content_types:
-  - response
-  owasp_llm: LLM06
-- rule_id: T6-password-kv-pair
-  name: Password Key-Value Pair Exfiltration
-  severity: MEDIUM
-  category: data-exfiltration
-  content_types:
-  - response
-  owasp_llm: LLM06
-- rule_id: T6-ssh-private-key
-  name: SSH / Private Key Exfiltration
-  severity: HIGH
-  category: data-exfiltration
-  content_types:
-  - response
-  owasp_llm: LLM06
 - rule_id: aws-credentials-pattern
   name: AWS Credentials Exfiltration
   severity: HIGH
@@ -59,6 +38,20 @@ rules:
   content_types:
   - response
   owasp_llm: LLM02
+- rule_id: github-extended-token
+  name: GitHub OAuth / Fine-Grained PAT / GitLab Deploy Token Exfiltration
+  severity: HIGH
+  category: data-exfiltration
+  content_types:
+  - response
+  owasp_llm: LLM06
+- rule_id: password-kv-pair
+  name: Password Key-Value Pair Exfiltration
+  severity: MEDIUM
+  category: data-exfiltration
+  content_types:
+  - response
+  owasp_llm: LLM06
 - rule_id: pci-pattern-detector
   name: PCI-DSS Sensitive Authentication Data Detection
   severity: HIGH
@@ -101,6 +94,13 @@ rules:
   content_types:
   - response
   owasp_llm: LLM02
+- rule_id: ssh-private-key
+  name: SSH / Private Key Exfiltration
+  severity: HIGH
+  category: data-exfiltration
+  content_types:
+  - response
+  owasp_llm: LLM06
 - rule_id: ssn-pattern
   name: Social Security Number Exfiltration
   severity: HIGH
@@ -167,53 +167,6 @@ rules:
   - user_input
   - retrieval
   owasp_llm: LLM07
-- rule_id: T1-encoding-base64
-  name: Base64-Encoded Injection Delivery
-  severity: HIGH
-  category: prompt-injection
-  content_types:
-  - user_input
-  - retrieval
-  owasp_llm: LLM01
-- rule_id: T1-encoding-hex
-  name: Hex-Encoded Injection Delivery
-  severity: HIGH
-  category: prompt-injection
-  content_types:
-  - user_input
-  - retrieval
-  owasp_llm: LLM01
-- rule_id: T1-encoding-rot13
-  name: ROT13-Encoded Injection Delivery
-  severity: MEDIUM
-  category: prompt-injection
-  content_types:
-  - user_input
-  - retrieval
-  owasp_llm: LLM01
-- rule_id: T1-false-authorization-claim
-  name: False Prior Authorization Claim
-  severity: HIGH
-  category: prompt-injection
-  content_types:
-  - user_input
-  owasp_llm: LLM01
-- rule_id: T2-bidi-override
-  name: Trojan Source BiDi Override Injection
-  severity: HIGH
-  category: prompt-injection
-  content_types:
-  - user_input
-  - retrieval
-  owasp_llm: LLM02
-- rule_id: T2-homoglyph-injection
-  name: Cyrillic / Greek / Armenian Homoglyph Keyword Evasion
-  severity: MEDIUM
-  category: prompt-injection
-  content_types:
-  - user_input
-  - retrieval
-  owasp_llm: LLM01
 - rule_id: adversarial-suffix
   name: Adversarial Suffix Attack
   severity: MEDIUM
@@ -230,6 +183,14 @@ rules:
   - user_input
   - retrieval
   owasp_llm: LLM01
+- rule_id: bidi-override
+  name: Trojan Source BiDi Override Injection
+  severity: HIGH
+  category: prompt-injection
+  content_types:
+  - user_input
+  - retrieval
+  owasp_llm: LLM02
 - rule_id: context-window-stuffing
   name: Context Window Stuffing
   severity: MEDIUM
@@ -245,6 +206,30 @@ rules:
   content_types:
   - user_input
   owasp_llm: LLM01
+- rule_id: encoding-base64-injection
+  name: Base64-Encoded Injection Delivery
+  severity: HIGH
+  category: prompt-injection
+  content_types:
+  - user_input
+  - retrieval
+  owasp_llm: LLM01
+- rule_id: encoding-hex-injection
+  name: Hex-Encoded Injection Delivery
+  severity: HIGH
+  category: prompt-injection
+  content_types:
+  - user_input
+  - retrieval
+  owasp_llm: LLM01
+- rule_id: encoding-rot13-injection
+  name: ROT13-Encoded Injection Delivery
+  severity: MEDIUM
+  category: prompt-injection
+  content_types:
+  - user_input
+  - retrieval
+  owasp_llm: LLM01
 - rule_id: escape-sequence
   name: Prompt Escape Sequence
   severity: MEDIUM
@@ -252,8 +237,23 @@ rules:
   content_types:
   - user_input
   owasp_llm: LLM01
+- rule_id: false-authorization-claim
+  name: False Prior Authorization Claim
+  severity: HIGH
+  category: prompt-injection
+  content_types:
+  - user_input
+  owasp_llm: LLM01
 - rule_id: hidden-unicode-instruction
   name: Hidden Unicode Instruction
+  severity: MEDIUM
+  category: prompt-injection
+  content_types:
+  - user_input
+  - retrieval
+  owasp_llm: LLM01
+- rule_id: homoglyph-injection
+  name: Cyrillic / Greek / Armenian Homoglyph Keyword Evasion
   severity: MEDIUM
   category: prompt-injection
   content_types:

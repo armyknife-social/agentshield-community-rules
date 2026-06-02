@@ -1,5 +1,5 @@
 schema_version: agentshield-rule-v0.1
-rule_id: T1-false-authorization-claim
+rule_id: false-authorization-claim
 name: "False Prior Authorization Claim"
 description: >
   Detects prompts that falsely claim prior authorization, ongoing security

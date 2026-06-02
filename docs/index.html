@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<meta name="description" content="AgentShield Community Rules — open-source detection rules for AI agent security. 49 rules covering OWASP LLM Top 10, prompt injection, data exfiltration, tool abuse, and compliance profiles for HIPAA, PCI-DSS, SOC 2, FedRAMP, and GDPR."/>
+<meta name="description" content="AgentShield Community Rules — open-source detection rules for AI agent security. 58 rules covering OWASP LLM Top 10, prompt injection, data exfiltration, tool abuse, and compliance profiles for HIPAA, PCI-DSS, SOC 2, FedRAMP, and GDPR."/>
 <meta property="og:title" content="AgentShield Community Rules"/>
 <meta property="og:description" content="Detection rules for AI agent security. OWASP LLM Top 10 mapped. MIT licensed."/>
 <meta property="og:type" content="website"/>
@@ -486,7 +486,7 @@
 <div class="section" id="rules">
   <div class="section-header">
     <div class="section-label">Detection rules</div>
-    <h2>49 rules across 5 categories</h2>
+    <h2>58 rules across 5 categories</h2>
     <p class="section-desc">
       Every rule is a YAML file with a compiled regex detector, severity level,
       OWASP mapping, and test cases. Rules run inside cm-aegisd's inline content
@@ -498,14 +498,14 @@
     <div class="rule-card">
       <div class="rule-card-top">
         <span class="rule-id">prompt-injection/</span>
-        <span class="sev sev-high">12 rules</span>
+        <span class="sev sev-high">18 rules</span>
       </div>
       <div class="rule-desc">Direct instruction override, role hijack, jailbreak keywords, system prompt extraction, token manipulation, retrieval injection, hidden unicode, multimodal injection.</div>
     </div>
     <div class="rule-card">
       <div class="rule-card-top">
         <span class="rule-id">data-exfiltration/</span>
-        <span class="sev sev-high">11 rules</span>
+        <span class="sev sev-high">14 rules</span>
       </div>
       <div class="rule-desc">API keys, PAN, SSN, PHI (ICD-10, MRN), PCI track data, PII bulk, AWS credentials, private keys, DB connection strings, training data extraction probes.</div>
     </div>
@@ -567,11 +567,11 @@
   <div class="owasp-grid">
     <div class="owasp-row">
       <div class="owasp-id">LLM01</div>
-      <div><div class="owasp-name">Prompt Injection</div><div class="owasp-count">10 rules</div></div>
+      <div><div class="owasp-name">Prompt Injection</div><div class="owasp-count">20 rules</div></div>
     </div>
     <div class="owasp-row">
       <div class="owasp-id">LLM02</div>
-      <div><div class="owasp-name">Insecure Output Handling</div><div class="owasp-count">1 rule</div></div>
+      <div><div class="owasp-name">Insecure Output Handling</div><div class="owasp-count">9 rules</div></div>
     </div>
     <div class="owasp-row">
       <div class="owasp-id">LLM03</div>
@@ -579,7 +579,7 @@
     </div>
     <div class="owasp-row">
       <div class="owasp-id">LLM04</div>
-      <div><div class="owasp-name">Model Denial of Service</div><div class="owasp-count">1 rule</div></div>
+      <div><div class="owasp-name">Model Denial of Service</div><div class="owasp-count">2 rules</div></div>
     </div>
     <div class="owasp-row">
       <div class="owasp-id">LLM05</div>
@@ -587,23 +587,23 @@
     </div>
     <div class="owasp-row">
       <div class="owasp-id">LLM06</div>
-      <div><div class="owasp-name">Sensitive Info Disclosure</div><div class="owasp-count">4 rules</div></div>
+      <div><div class="owasp-name">Sensitive Info Disclosure</div><div class="owasp-count">8 rules</div></div>
     </div>
     <div class="owasp-row">
       <div class="owasp-id">LLM07</div>
-      <div><div class="owasp-name">Insecure Plugin Design</div><div class="owasp-count">3 rules</div></div>
+      <div><div class="owasp-name">Insecure Plugin Design</div><div class="owasp-count">6 rules</div></div>
     </div>
     <div class="owasp-row">
       <div class="owasp-id">LLM08</div>
-      <div><div class="owasp-name">Excessive Agency</div><div class="owasp-count">3 rules</div></div>
+      <div><div class="owasp-name">Excessive Agency</div><div class="owasp-count">6 rules</div></div>
     </div>
     <div class="owasp-row">
       <div class="owasp-id">LLM09</div>
-      <div><div class="owasp-name">Overreliance</div><div class="owasp-count">1 rule</div></div>
+      <div><div class="owasp-name">Overreliance</div><div class="owasp-count">3 rules</div></div>
     </div>
     <div class="owasp-row">
       <div class="owasp-id">LLM10</div>
-      <div><div class="owasp-name">Model Theft</div><div class="owasp-count">1 rule</div></div>
+      <div><div class="owasp-name">Model Theft</div><div class="owasp-count">2 rules</div></div>
     </div>
   </div>
 </div>

@@ -32,7 +32,7 @@ AgentShield is built for this threat model. These community rules are the detect
                     ┌──────────────────▼──────────────────────┐
                     │                Aegis                     │
                     │   Inline content inspector (cm-aegisd)   │
-                    │   19 rules compiled at startup           │
+                    │   58 rules compiled at startup           │
                     │   5-20ms inline budget · shadow mode     │
                     └──────────────────┬──────────────────────┘
                                        │
@@ -128,7 +128,7 @@ Community rules are **opt-in rules**. They are registered per-session when a plu
 
 ### Rule IDs must be registered
 
-For a community rule to fire in production, its `rule_id` must appear in `cm-agentshieldd`'s `KNOWN_OPT_IN_RULES` constant. All 49 rules in this repository are registered in the upstream AgentShield substrate. If you write a new rule, open a PR to add its ID to `KNOWN_OPT_IN_RULES` alongside the YAML.
+For a community rule to fire in production, its `rule_id` must appear in `cm-agentshieldd`'s `KNOWN_OPT_IN_RULES` constant. All 58 rules in this repository are registered in the upstream AgentShield substrate. If you write a new rule, open a PR to add its ID to `KNOWN_OPT_IN_RULES` alongside the YAML.
 
 ---
 
@@ -189,16 +189,16 @@ license: MIT
 Every OWASP LLM Top 10 category (2025) maps to one or more rules in this repository. See [OWASP-MAPPING.md](OWASP-MAPPING.md) for the complete mapping.
 
 ```
-LLM01  Prompt Injection               10 rules
-LLM02  Insecure Output Handling        1 rule
+LLM01  Prompt Injection               20 rules
+LLM02  Insecure Output Handling        9 rules
 LLM03  Training Data Poisoning         1 rule
-LLM04  Model Denial of Service         1 rule
+LLM04  Model Denial of Service         2 rules
 LLM05  Supply Chain Vulnerabilities    1 rule
-LLM06  Sensitive Information Disclosure 4 rules (phi, pci, secrets, training data)
-LLM07  Insecure Plugin Design          3 rules
-LLM08  Excessive Agency               3 rules
-LLM09  Overreliance                   1 rule
-LLM10  Model Theft                    1 rule
+LLM06  Sensitive Information Disclosure 8 rules (phi, pci, secrets, training data)
+LLM07  Insecure Plugin Design          6 rules
+LLM08  Excessive Agency               6 rules
+LLM09  Overreliance                   3 rules
+LLM10  Model Theft                    2 rules
 ```
 
 ---
