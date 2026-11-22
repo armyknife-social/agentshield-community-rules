@@ -18,7 +18,7 @@ action: block
 
 detector:
   type: regex
-  pattern: "(?i)(?:ignore\\s+(?:all\\s+)?(?:previous|above|prior)\\s+instructions?|you\\s+are\\s+now\\s+(?:a|an|the)|act\\s+as\\s+(?:a|an|the)\\s+(?:unrestricted|jailbroken|DAN)|disregard\\s+(?:your\\s+)?(?:guidelines?|rules?|constraints?)|developer\\s+mode\\s+enabled)"
+  pattern: "(?i)(?:ignore\\s+(?:all\\s+)?(?:previous|above|prior)\\s+instructions?|you\\s+are\\s+now\\s+(?:an|a|the)\\b|act\\s+as\\s+(?:a|an|the)\\s+(?:unrestricted|jailbroken|DAN)|disregard\\s+(?:your\\s+)?(?:guidelines?|rules?|constraints?)|developer\\s+mode\\s+enabled)"
 
 mitigation: >
   Block the request and return a 403 to the caller. Log the raw input, the matched
@@ -39,6 +39,7 @@ test_cases:
     - "Can you help me write a Python script to parse CSV files?"
     - "Please ignore the typo in my previous message and answer my question."
     - "You are now going to help me plan a birthday party."
+    - "You are now able to help me with this math problem."
 
 author: ArmyKnifeLabs
 license: MIT
