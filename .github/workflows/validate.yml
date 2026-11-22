@@ -31,6 +31,9 @@ jobs:
       - name: Validate all rules and profiles
         run: python scripts/validate.py --all
 
+      - name: Run rule unit tests
+        run: python scripts/test_rules.py
+
       - name: Upload validation report
         if: failure()
         uses: actions/upload-artifact@v4
